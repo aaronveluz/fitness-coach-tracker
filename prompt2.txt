@@ -1,0 +1,36 @@
+Build a production-ready, multipurpose boilerplate for a web application using the following stack:
+- Frontend: React (TypeScript), Next.js for SSR/SSG, Tailwind CSS, React Query
+- Backend: Node.js (TypeScript), NestJS (or Express with layered architecture)
+- Database: MariaDB (with migrations)
+- Auth: OAuth2/OpenID Connect + JWT refresh flow; role-based access control (RBAC)
+- DevOps: Docker + docker-compose for local dev; Kubernetes manifests and Helm chart for prod; Terraform for infra
+- Observability: OpenTelemetry tracing, Prometheus metrics, Grafana dashboards, structured logging
+- CI/CD: GitHub Actions pipeline with lint, test, build, containerize, and deploy stages
+
+Requirements and deliverables:
+1. **Architecture & code**: clear modular folder structure (apps/frontend, apps/api, libs/common, jobs, infra, scripts, tests, docs); layered backend (controllers, services, repositories); shared types and DTOs.
+2. **Auth & Security**: login, signup, role assignment UI; protected routes; middleware for RBAC; CSRF, CORS, input validation, rate limiting, secrets management.
+3. **Database**: MariaDB schema and example migrations; repository/ORM pattern (Prisma or TypeORM configured for MariaDB); sample entities: users, roles, reports, audit_logs.
+4. **Extensibility**: CLI scaffolder or code generator to add a new module (controller, service, repo, frontend page, tests) with one command.
+5. **Reporting**: sample report pipeline that queries MariaDB, transforms data, exports CSV and PDF, scheduled job (cron) and API to request/download reports.
+6. **Testing**: unit tests, integration tests, and e2e tests (Playwright or Cypress) with CI integration and test data seeding.
+7. **Dev experience**: ESLint, Prettier, Husky commit hooks, Storybook for components, developer CLI, and `npm run dev` or `make dev` to start full stack locally.
+8. **Containerization & infra**: Dockerfiles for frontend and backend; docker-compose for local; Kubernetes manifests + Helm chart; Terraform examples for cloud infra (DB, app, monitoring).
+9. **Observability & performance**: health checks, Prometheus metrics, OpenTelemetry traces, sample Grafana dashboard, caching layer example (Redis), connection pooling, and a simple load-test script.
+10. **Docs & acceptance criteria**: README with setup, architecture diagram, extension guide; sample pages and APIs; sample report generation; CI config; security checklist. Acceptance: local dev starts with one command; Docker images build; auth demo works; sample report generates and downloads; CI pipeline runs tests.
+
+Implementation notes for generator:
+- Use TypeScript across frontend and backend.
+- Keep controllers thin; put business logic in services.
+- Provide clear step-by-step example: "Add a new page + API" in 5 steps.
+- Provide example environment files and instructions for secrets.
+- Include at least one example of role-protected page and API.
+- Provide sample seed data and SQL for MariaDB.
+
+Output expected from this generation:
+- A runnable repository skeleton with working example implementations.
+- All configuration files, scripts, and CI pipeline files.
+- Concise developer guide showing how to add business logic, pages, and reports.
+- Minimal working demo that satisfies the acceptance criteria above.
+
+If possible, prefer NestJS for backend scaffolding and Prisma or TypeORM configured for MariaDB. Otherwise use Express + Prisma. Keep everything TypeScript-first.

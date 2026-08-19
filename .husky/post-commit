@@ -1,0 +1,31 @@
+#!/bin/sh
+# ─────────────────────────────────────────────────────────────────────────────
+# .husky/post-commit
+#
+# Runs AFTER every commit. Updates all documentation files and amends
+# the current commit to include the updated docs. The --no-verify flag
+# prevents this amended commit from re-triggering hooks (no infinite loop).
+#
+# SETUP (run once after cloning):
+#   npm install
+#   npx husky install
+# ─────────────────────────────────────────────────────────────────────────────
+
+echo "📝  Auto-updating documentation..."
+node scripts/update-docs.js
+
+# Stage the updated doc files
+git add \
+  docs/CHANGELOG.md \
+  docs/RELEASE_NOTES.md \
+  docs/ARCHITECTURE.md \
+  docs/TROUBLESHOOTING.md \
+  docs/AI_AGENT_RULES.md \
+  2>/dev/null || true
+
+# Amend the previous commit to include the updated docs.
+# --no-edit keeps the original commit message unchanged.
+# --no-verify skips hooks to prevent an infinite loop.
+git diff --cached --quiet || git commit --amend --no-edit --no-verify
+
+echo "✅  Documentation committed."

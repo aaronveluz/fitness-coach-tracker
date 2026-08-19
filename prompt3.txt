@@ -1,0 +1,35 @@
+I want to build a multipurpose, production-grade boilerplate/starter template for a business web application. This isn't a single app — it's a reusable foundation other projects will be cloned from, so prioritize modularity, clear conventions, and low friction for adding new features later.
+
+STACK:
+- Frontend: React (Vite) + TypeScript, React Router, TanStack Query for data fetching, Tailwind CSS + shadcn/ui, React Hook Form + Zod for forms/validation.
+- Backend: Node.js + Express (or Fastify) + TypeScript.
+- Database: MariaDB. Choose the ORM (Sequelize or Prisma) that gives the cleanest migration and typing experience with MariaDB — explain your choice briefly before proceeding.
+- Monorepo: Turborepo + pnpm workspaces, with /apps/frontend, /apps/backend, /packages/shared for shared types/schemas, and /packages/config for shared ESLint/TSConfig.
+
+ARCHITECTURE REQUIREMENTS:
+- Feature-based folder structure on both frontend and backend (e.g. /features/<domain> containing components, hooks, routes, controllers, services, and validation schemas) so new business logic modules can be dropped in without touching core code.
+- Backend layered as routes -> controllers -> services -> repositories, with a generic base repository/service class new modules can extend for CRUD.
+- Shared TypeScript types/Zod schemas in /packages/shared, used by both frontend and backend to keep contracts in sync.
+- Config-driven navigation/sidebar on the frontend so adding a new page auto-registers in the nav and route table.
+- A reporting module scaffold: reusable table/chart components (frontend), server-side aggregation/query utilities (backend), and CSV/PDF export endpoints.
+
+SECURITY:
+- JWT-based auth (access + refresh tokens) with role-based access control (RBAC) middleware.
+- Input validation with Zod on every API route (shared schemas with frontend).
+- Helmet for secure HTTP headers, explicit CORS config, rate limiting (e.g. express-rate-limit) on public/auth endpoints.
+- Environment variable validation at startup (fail fast if misconfigured); secrets never bundled into frontend code.
+- Parameterized queries only (no raw string SQL); audit logging for sensitive actions.
+
+SCALABILITY & MAINTAINABILITY:
+- Database migrations and seed scripts via the chosen ORM's migration tool.
+- Multi-tenancy ready (organization/workspace model) even if unused initially.
+- Background job/queue abstraction (e.g. BullMQ with Redis) for async tasks like report generation or emails.
+- Centralized error handling middleware and structured logging (e.g. pino or winston).
+- Turborepo pipeline configured for build/lint/test caching; Docker + docker-compose for local dev (Node backend, MariaDB, Redis); GitHub Actions CI pipeline (lint, typecheck, test, build) that leverages Turborepo's remote caching.
+
+DEVELOPER EXPERIENCE:
+- ESLint + Prettier + strict TypeScript config shared across the monorepo via /packages/config.
+- Unit + integration tests (Vitest for both apps) and e2e tests (Playwright) against a test MariaDB instance.
+- A /docs folder explaining the architecture and a step-by-step guide for "how to add a new module/page/report."
+
+Start by proposing the Turborepo folder structure, your ORM choice with reasoning, and an implementation plan before writing any code, so I can review it first.

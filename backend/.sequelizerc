@@ -1,0 +1,20 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// backend/.sequelizerc
+//
+// Sequelize CLI configuration. This file tells the CLI where to find:
+//   - DB config  → database/config/config.js
+//   - Migrations → database/migrations/
+//   - Seeders    → database/seeders/
+//   - Models     → backend/src/modules/ (each module has its own model file)
+//
+// IMPORTANT: Run all `npm run db:*` commands from the backend/ directory.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const path = require('path');
+
+module.exports = {
+  config:             path.resolve(__dirname, '../database/config/config.js'),
+  'migrations-path':  path.resolve(__dirname, '../database/migrations'),
+  'seeders-path':     path.resolve(__dirname, '../database/seeders'),
+  'models-path':      path.resolve(__dirname, 'src/modules'),
+};

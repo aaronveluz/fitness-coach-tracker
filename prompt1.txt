@@ -1,0 +1,35 @@
+Act as a Principal Software Architect. Initialize a production-ready, highly secure, scalable, and modular full-stack boilerplate using React.js (Frontend), Node.js with TypeScript (Backend), and MariaDB (Database). This boilerplate must be designed for continuous, clean feature expansion by future subagents.
+
+### 1. Architectural Pattern (Modular / Feature-Driven Monolith)
+To ensure new business logic, pages, and reports can be added seamlessly without breaking existing code, scaffold the project using a feature-based folder structure. 
+
+Organize the codebase into the following explicit directory structure:
+
+Backend (`/backend`):
+- `/src/core/` (Global middleware, MariaDB connection pool, centralized error handling, shared utilities)
+- `/src/modules/[feature_name]/`
+  - `routes.ts` (API route definitions)
+  - `controller.ts` (HTTP request/response handling and input validation)
+  - `service.ts` (Pure business logic, calculations, and rules)
+  - `repository.ts` (Raw SQL queries or query builder interactions with MariaDB)
+
+Frontend (`/frontend`):
+- `/src/core/` (Shared UI components, global layout/navigation, API client configurations, global context)
+- `/src/modules/[feature_name]/`
+  - `components/` (UI components unique to this feature)
+  - `pages/` (View layouts and page routes)
+  - `hooks/` (State management or feature-specific data fetching)
+
+### 2. Feature Plugs for Easy Expansion
+Implement the following foundational systems with concrete templates:
+- **Dynamic Pages & Routing:** In the React frontend, set up a centralized layout wrapper (e.g., dashboard shell with sidebar/topbar). The sidebar navigation must dynamically render based on an array configuration file, making it easy to plug in new pages.
+- **Business Logic Blueprint:** Provide a fully implemented example domain module (e.g., `UserManagement`) on both frontend and backend. It must demonstrate input validation, clean execution of business rules, and strict error handling.
+- **Reporting Engine Shell:** Create a dedicated `/src/modules/reports/` framework. The backend should include a base service that fetches relational data from MariaDB and formats it into structured JSON arrays optimized for tabular rendering. The frontend should include a reusable `<ReportTable />` component with mock CSV export handling.
+
+### 3. Security & Database Resilience
+- **Database Access:** Implement parameterized queries for all MariaDB operations to prevent SQL injection. Include a robust connection pooling configuration with automatic reconnection logic.
+- **Input Validation:** Enforce strict runtime input validation on all backend API endpoints (using Zod or a similar validation library).
+- **Global Error Handler:** Implement a centralized backend error middleware. It must securely log raw system exceptions internally and return uniform, sanitized, and user-friendly JSON error messages to the client. Never expose raw MariaDB database errors or stack traces to the frontend.
+
+### 4. Output & Documentation Requirements
+Before writing the code, generate a clear Implementation Plan detailing the directory map and API data flow. Upon completion, generate a comprehensive local `ARCHITECTURE.md` file that documents this structural convention, ensuring future subagents can read it as context to accurately scale this exact design pattern.

@@ -1,0 +1,15 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// database/.sequelizerc
+//
+// Tells the Sequelize CLI where to find migrations, seeders, models, and config.
+// Run all `npx sequelize-cli` commands from the /backend directory.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const path = require('path');
+
+module.exports = {
+  config:          path.resolve(__dirname, 'config', 'config.js'),
+  'models-path':   path.resolve(__dirname, '..', 'backend', 'src', 'modules'),
+  'migrations-path': path.resolve(__dirname, 'migrations'),
+  'seeders-path':  path.resolve(__dirname, 'seeders'),
+};

@@ -1,0 +1,76 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# .github/workflows/ci.yml
+#
+# Continuous Integration pipeline — runs on every push and pull request.
+# Gates: lint → typecheck → test → build (all must pass)
+#
+# This ensures broken code is caught before it reaches the main branch.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  ci:
+    name: Lint · Typecheck · Test · Build
+    runs-on: ubuntu-latest
+
+    # Provide a MariaDB service for integration tests
+    services:
+      mariadb:
+        image: mariadb:11.3
+        env:
+          MYSQL_ROOT_PASSWORD: testpassword
+          MYSQL_DATABASE: enterprise_db_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --workspaces --if-present
+
+      - name: Typecheck
+        run: npm run typecheck --workspaces --if-present
+
+      - name: Test
+        run: npm run test --workspaces --if-present
+        env:
+          NODE_ENV: test
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_NAME: enterprise_db_test
+          DB_USER: root
+          DB_PASSWORD: testpassword
+          JWT_ACCESS_SECRET: ci_test_access_secret_minimum_32_characters_long
+          JWT_REFRESH_SECRET: ci_test_refresh_secret_minimum_32_characters_long
+          CORS_ORIGIN: http://localhost:5173
+
+      - name: Build backend
+        run: npm run build --workspace=backend
+
+      - name: Build frontend
+        run: npm run build --workspace=frontend
+        env:
+          VITE_API_BASE_URL: http://localhost:4000/api/v1

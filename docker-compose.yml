@@ -1,0 +1,62 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.yml
+#
+# Starts the full local development stack with one command:
+#   docker-compose up -d
+#
+# Services:
+#   mariadb  — MariaDB database on port 3306
+#   redis    — Redis for background job queues on port 6379
+#   adminer  — Web-based database GUI at http://localhost:8080
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: '3.9'
+
+services:
+
+  # ── MariaDB Database ────────────────────────────────────────────────────────
+  mariadb:
+    image: mariadb:11.3
+    container_name: boilerplate_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-enterprise_db}
+      MYSQL_USER: ${DB_USER:-appuser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-rootpassword}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      # Optional: run init SQL scripts on first start
+      # - ./database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis (for BullMQ background jobs) ─────────────────────────────────────
+  redis:
+    image: redis:7.2-alpine
+    container_name: boilerplate_redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+
+  # ── Adminer (Database GUI — dev only) ──────────────────────────────────────
+  adminer:
+    image: adminer:4.8.1
+    container_name: boilerplate_adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mariadb
+
+# ── Named Volumes ─────────────────────────────────────────────────────────────
+volumes:
+  mariadb_data:
+  redis_data:

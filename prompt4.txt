@@ -1,0 +1,408 @@
+Create an enterprise-grade, multipurpose, reusable, scalable, and secure full-stack application boilerplate using:
+
+Frontend:
+- ReactJS
+- TypeScript
+- Vite
+- React Router
+- React Query / TanStack Query
+- Zustand or Redux Toolkit for global state management
+- React Hook Form
+- Zod validation
+- Component-based architecture
+
+Backend:
+- Node.js
+- Express.js
+- TypeScript
+- REST API architecture
+- Sequelize ORM
+- MariaDB database
+- JWT authentication
+- Refresh token system
+
+Database:
+- MariaDB
+- Migration support
+- Seed data support
+- Proper indexing strategy
+- Transaction support
+
+
+OBJECTIVE:
+
+Create a reusable enterprise application foundation that can support multiple business systems:
+
+- POS
+- Inventory
+- ERP
+- Accounting
+- CRM
+- HR systems
+- Reporting dashboards
+- Integration platforms
+
+The boilerplate must make it easy to add:
+- New business modules
+- New pages
+- New API endpoints
+- New database tables
+- New reports
+- New dashboards
+- New integrations
+
+Do not build a single application. Build a reusable framework/platform.
+
+
+==================================
+PROJECT STRUCTURE
+==================================
+
+Create a monorepo:
+
+/frontend
+/backend
+/database
+/shared
+/docs
+/docker
+/scripts
+
+
+==================================
+FRONTEND ARCHITECTURE
+==================================
+
+Use feature-based architecture.
+
+Structure:
+
+frontend/src/
+
+app/
+ ├── router/
+ ├── providers/
+ └── store/
+
+features/
+
+ ├── auth/
+ ├── users/
+ ├── dashboard/
+ ├── reports/
+ └── sample-module/
+
+
+Each feature must follow:
+
+feature-name/
+
+pages/
+components/
+hooks/
+services/
+api/
+types/
+schemas/
+utils/
+
+
+Rules:
+
+- Pages should only handle UI composition
+- Business logic belongs in hooks/services
+- API calls must use centralized API service
+- Components must be reusable
+- Avoid duplicated code
+- Use TypeScript interfaces everywhere
+- Support lazy loading
+- Support route protection
+- Support permission-based menu rendering
+
+
+Create reusable components:
+
+- DataTable
+- Pagination
+- Search filters
+- Date filters
+- Modal dialogs
+- Forms
+- Dropdowns
+- File upload
+- Export buttons
+- Dashboard widgets
+
+
+==================================
+BACKEND ARCHITECTURE
+==================================
+
+Use modular architecture:
+
+backend/src/
+
+config/
+
+database/
+
+modules/
+
+ ├── auth/
+ ├── users/
+ ├── roles/
+ ├── permissions/
+ ├── reports/
+ └── sample-module/
+
+
+Each module:
+
+module-name/
+
+controller/
+service/
+repository/
+model/
+routes/
+validation/
+types/
+tests/
+
+
+Rules:
+
+Controller:
+- Handles HTTP only
+
+Service:
+- Contains business logic
+
+Repository:
+- Handles database operations
+
+Model:
+- Sequelize models only
+
+
+==================================
+DATABASE DESIGN
+==================================
+
+MariaDB database design must support future enterprise requirements.
+
+Include:
+
+users
+roles
+permissions
+role_permissions
+user_permissions
+audit_logs
+system_settings
+notifications
+
+
+All tables must include:
+
+id
+created_at
+updated_at
+created_by
+updated_by
+is_active
+
+
+Prepare architecture for:
+
+- Multiple companies
+- Multiple branches
+- Multiple warehouses
+- Multiple users
+- Permission-based access
+
+
+==================================
+SECURITY REQUIREMENTS
+==================================
+
+Implement:
+
+Authentication:
+
+- JWT access tokens
+- Refresh tokens
+- Secure token handling
+- Password hashing using bcrypt
+
+
+Authorization:
+
+- Role Based Access Control
+- Permission middleware
+- API endpoint protection
+
+
+Security:
+
+- Helmet
+- CORS configuration
+- Rate limiting
+- Input validation
+- SQL injection protection
+- XSS protection
+- Secure environment variables
+- Error handling without exposing sensitive information
+
+
+==================================
+REUSABLE CRUD FRAMEWORK
+==================================
+
+Create a reusable CRUD foundation.
+
+Developers should be able to create a new module by defining:
+
+- Database model
+- Validation schema
+- Columns
+- Permissions
+
+and automatically support:
+
+- Create
+- Read
+- Update
+- Delete
+- Search
+- Filtering
+- Pagination
+- Sorting
+- Export
+
+
+==================================
+REPORTING FRAMEWORK
+==================================
+
+Create reusable reporting infrastructure.
+
+Support:
+
+- Table reports
+- Summary reports
+- Dashboard charts
+- Date filtering
+- Multiple filters
+- Export Excel
+- Export PDF
+- Saved report configurations
+
+
+Example:
+
+reports/
+
+sales-report/
+inventory-report/
+customer-report/
+
+
+==================================
+INTEGRATION FRAMEWORK
+==================================
+
+Prepare reusable services for:
+
+- REST API integrations
+- External authentication
+- Webhooks
+- Scheduled synchronization jobs
+- Background workers
+
+
+==================================
+LOGGING AND MONITORING
+==================================
+
+Include:
+
+- Application logging
+- Error logging
+- Audit trail
+- Performance monitoring hooks
+
+
+==================================
+DOCUMENTATION
+==================================
+
+Create:
+
+/docs/
+
+ARCHITECTURE.md
+CODING_STANDARDS.md
+DATABASE_GUIDELINES.md
+SECURITY_GUIDELINES.md
+MODULE_CREATION_GUIDE.md
+API_GUIDE.md
+AI_AGENT_RULES.md
+
+
+AI_AGENT_RULES.md must explain:
+
+- How future AI assistants should modify code
+- How to create new modules
+- Where business logic belongs
+- Coding standards
+- Security rules
+- Testing requirements
+
+
+==================================
+DEVELOPMENT TOOLS
+==================================
+
+Include:
+
+- ESLint
+- Prettier
+- Docker Compose
+- Environment templates
+- Git workflow
+- Unit testing setup
+- API documentation using Swagger/OpenAPI
+
+
+==================================
+IMPLEMENTATION PLAN
+==================================
+
+Do not generate the entire system immediately.
+
+Build in phases:
+
+Phase 1:
+Architecture, folder structure, configuration, documentation.
+
+Phase 2:
+Authentication, users, roles, permissions.
+
+Phase 3:
+Reusable CRUD engine.
+
+Phase 4:
+Reporting framework.
+
+Phase 5:
+Sample business module.
+
+Phase 6:
+Testing, optimization, security review.
+
+
+Before coding each phase:
+Explain the design decisions and wait for approval.
+
+The final output should be a production-ready enterprise boilerplate that can be reused for many applications with minimal restructuring.
