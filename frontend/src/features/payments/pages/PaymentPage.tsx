@@ -33,9 +33,6 @@ export default function PaymentPage() {
         </div>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button className="btn btn-donate btn-sm" onClick={openDonateModal}>
-            <span>💖</span> Tip Coach Pat QR
-          </button>
           <button className="btn btn-primary btn-sm" onClick={() => openPaymentModal()}>
             <span>⚡</span> Open QR Payment Scanner
           </button>

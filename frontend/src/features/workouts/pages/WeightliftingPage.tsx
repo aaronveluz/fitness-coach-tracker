@@ -550,8 +550,36 @@ export default function WeightliftingPage() {
             </div>
 
             {wo.notes && (
-              <div style={{ fontSize: 12, color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', padding: '8px 12px', borderRadius: 'var(--radius-sm)' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', padding: '8px 12px', borderRadius: 'var(--radius-sm)', marginBottom: 8 }}>
                 <strong>Notes: </strong>{wo.notes}
+              </div>
+            )}
+
+            {/* Coach Pat Review Remarks */}
+            {wo.coachRemarks && (
+              <div style={{ background: 'rgba(244, 63, 94, 0.12)', borderLeft: '3px solid var(--color-rose)', padding: '8px 12px', borderRadius: 'var(--radius-sm)', fontSize: 12, color: '#fda4af', marginBottom: 8 }}>
+                <strong>Coach Pat Feedback:</strong> {wo.coachRemarks}
+              </div>
+            )}
+
+            {wo.coachStatus === 'completed' && (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <span className="badge badge-emerald" style={{ fontSize: 10 }}>✓ Verified & Approved by Coach Pat</span>
+              </div>
+            )}
+
+            {/* Comments Thread */}
+            {wo.comments && wo.comments.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10, paddingLeft: 10, borderLeft: '2px solid var(--border-medium)' }}>
+                {wo.comments.map(c => (
+                  <div key={c.id} style={{ fontSize: 12 }}>
+                    <strong style={{ color: c.authorRole === 'coach' ? 'var(--color-rose)' : 'var(--color-primary)' }}>
+                      {c.authorName}:
+                    </strong>{' '}
+                    <span style={{ color: 'var(--text-muted)' }}>{c.text}</span>
+                    <span style={{ fontSize: 9, color: 'var(--text-subtle)', marginLeft: 6 }}>({c.createdAt})</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>

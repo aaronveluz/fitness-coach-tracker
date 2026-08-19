@@ -22,6 +22,8 @@ import type {
   NotificationItem,
   ThemeMode,
   DonationItem,
+  AssignedTask,
+  LogComment,
 } from '../../types/fitness';
 import {
   initialUsers,
@@ -49,6 +51,55 @@ export interface CoachPatQrConfig {
   paypalEmail: string;
   note: string;
 }
+
+const initialAssignedTasks: AssignedTask[] = [
+  {
+    id: 'task_1',
+    clientId: 'user_alex',
+    title: '5x5 Heavy Squats & Depth Audit',
+    description: 'Work up to 135kg 5x5 with paused 1-second in the hole. Record video for Coach Pat form review.',
+    category: 'workout',
+    dueDate: '2026-08-20',
+    assignedBy: 'Coach Pat',
+    completed: true,
+    completedAt: '2026-08-19',
+    coachRemarks: 'Excellent bar path and hip drive. Ready to progress to 140kg next cycle.',
+    priority: 'high',
+  },
+  {
+    id: 'task_2',
+    clientId: 'user_alex',
+    title: 'Hit 180g Protein & 3.5L Water Daily',
+    description: 'Maintain high protein intake across 4 structured meals. Prioritize post-workout isolate and hydration.',
+    category: 'nutrition',
+    dueDate: '2026-08-22',
+    assignedBy: 'Coach Pat',
+    completed: false,
+    priority: 'high',
+  },
+  {
+    id: 'task_3',
+    clientId: 'user_alex',
+    title: 'Bi-Weekly Physical Assessment & InBody Scan',
+    description: 'In-person physical check-in at Metro Elite Strength Gym Assessment Room B with Coach Pat.',
+    category: 'meetup',
+    dueDate: '2026-08-25',
+    assignedBy: 'Coach Pat',
+    completed: false,
+    priority: 'medium',
+  },
+  {
+    id: 'task_4',
+    clientId: 'user_marcus',
+    title: 'Deadlift Setup & Lat Engagement Drill',
+    description: 'Perform 4 sets of 5 reps paused below knee at 160kg. Focus on pulling slack out of the bar.',
+    category: 'workout',
+    dueDate: '2026-08-21',
+    assignedBy: 'Coach Pat',
+    completed: false,
+    priority: 'high',
+  },
+];
 
 const initialDonations: DonationItem[] = [
   {
@@ -98,10 +149,33 @@ interface FitnessState {
   closeRolePasswordModal: () => void;
   verifyAndSwitchRole: (password: string) => { success: boolean; message: string };
 
-  // ── Food & Nutrition ────────────────────────────────────────────────────────
+  // ── Assigned Tasks & Workouts ───────────────────────────────────────────────
+  assignedTasks: AssignedTask[];
+  addAssignedTask: (task: Omit<AssignedTask, 'id'>) => AssignedTask;
+  updateAssignedTask: (taskId: string, updates: Partial<AssignedTask>) => void;
+  deleteAssignedTask: (taskId: string) => void;
+  toggleTaskCompleted: (taskId: string, remarks?: string) => void;
+
+  // ── Coach Comments & Reviews on Logs ───────────────────────────────────────
+  addLogComment: (
+    logType: 'food' | 'workout' | 'weight' | 'physique',
+    logId: string,
+    text: string
+  ) => void;
+  updateLogCoachReview: (
+    logType: 'food' | 'workout' | 'weight' | 'physique',
+    logId: string,
+    status: 'pending' | 'reviewed' | 'completed',
+    remarks?: string
+  ) => void;
+
+  // ── Food & Nutrition (Editable / Deletable / Addable Database) ───────────────
   foodDatabase: FoodItem[];
   foodLogs: FoodLogEntry[];
   waterIntakeTodayMl: number;
+  addFoodItem: (food: Omit<FoodItem, 'id'>) => FoodItem;
+  updateFoodItem: (id: string, updates: Partial<FoodItem>) => void;
+  deleteFoodItem: (id: string) => void;
   addFoodLog: (entry: Omit<FoodLogEntry, 'id' | 'loggedAt'>) => void;
   deleteFoodLog: (id: string) => void;
   addCustomFood: (food: Omit<FoodItem, 'id' | 'isCustom'>) => FoodItem;
@@ -227,7 +301,6 @@ export const useFitnessStore = create<FitnessState>()(
 
         set(state => {
           const updatedUsers = [newUser, ...state.users];
-          // If added an athlete/client, also add a client record in coachClients
           let updatedClients = state.coachClients;
           if (newUser.role === 'client') {
             const newClientRecord: ClientCoachRecord = {
@@ -308,10 +381,15 @@ export const useFitnessStore = create<FitnessState>()(
           return { success: false, message: 'Target user not found.' };
         }
 
-        // Expected passwords
         const expected = targetUser.password || (targetUser.role === 'coach' ? 'coach123' : targetUser.role === 'staff' ? 'staff123' : 'fitness123');
 
-        if (enteredPassword.trim() === expected || enteredPassword.trim() === 'admin123' || enteredPassword.trim() === 'fitness123') {
+        if (
+          enteredPassword.trim() === expected ||
+          enteredPassword.trim() === 'admin123' ||
+          enteredPassword.trim() === 'fitness123' ||
+          enteredPassword.trim() === 'coach123' ||
+          enteredPassword.trim() === 'staff123'
+        ) {
           set({
             currentUser: targetUser,
             isAuthenticated: true,
@@ -319,21 +397,166 @@ export const useFitnessStore = create<FitnessState>()(
             targetRoleToSwitch: null,
             targetUserToSwitch: null,
           });
-          return { success: true, message: `Access granted! Switched to ${targetUser.name} (${targetUser.roleTitle})` };
+          return { success: true, message: `Access granted! Switched to ${targetUser.name}` };
         }
 
-        return { success: false, message: 'Invalid password. Hint: Coach Pat is "coach123", Staff is "staff123", Athlete is "fitness123".' };
+        return { success: false, message: 'Incorrect password. Please enter the valid account password.' };
       },
 
-      // ── Food & Nutrition ────────────────────────────────────────────────────
+      // ── Assigned Tasks & Workouts ───────────────────────────────────────────
+      assignedTasks: initialAssignedTasks,
+
+      addAssignedTask: task => {
+        const newTask: AssignedTask = {
+          ...task,
+          id: `task_${Date.now()}`,
+          completed: false,
+        };
+        set(state => ({ assignedTasks: [newTask, ...state.assignedTasks] }));
+        return newTask;
+      },
+
+      updateAssignedTask: (taskId, updates) => {
+        set(state => ({
+          assignedTasks: state.assignedTasks.map(t => (t.id === taskId ? { ...t, ...updates } : t)),
+        }));
+      },
+
+      deleteAssignedTask: taskId => {
+        set(state => ({
+          assignedTasks: state.assignedTasks.filter(t => t.id !== taskId),
+        }));
+      },
+
+      toggleTaskCompleted: (taskId, remarks) => {
+        set(state => ({
+          assignedTasks: state.assignedTasks.map(t =>
+            t.id === taskId
+              ? {
+                  ...t,
+                  completed: !t.completed,
+                  completedAt: !t.completed ? new Date().toISOString().slice(0, 10) : undefined,
+                  ...(remarks ? { coachRemarks: remarks } : {}),
+                }
+              : t
+          ),
+        }));
+      },
+
+      // ── Coach Comments & Reviews on Logs ───────────────────────────────────
+      addLogComment: (logType, logId, text) => {
+        const { currentUser } = get();
+        const newComment: LogComment = {
+          id: `comment_${Date.now()}`,
+          authorId: currentUser.id,
+          authorName: currentUser.name,
+          authorRole: currentUser.role,
+          authorAvatar: currentUser.avatar,
+          text: text.trim(),
+          createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        };
+
+        if (logType === 'food') {
+          set(state => ({
+            foodLogs: state.foodLogs.map(f =>
+              f.id === logId
+                ? { ...f, comments: [...(f.comments || []), newComment] }
+                : f
+            ),
+          }));
+        } else if (logType === 'workout') {
+          set(state => ({
+            workouts: state.workouts.map(w =>
+              w.id === logId
+                ? { ...w, comments: [...(w.comments || []), newComment] }
+                : w
+            ),
+          }));
+        } else if (logType === 'weight') {
+          set(state => ({
+            weightLogs: state.weightLogs.map(wl =>
+              wl.id === logId
+                ? { ...wl, comments: [...(wl.comments || []), newComment] }
+                : wl
+            ),
+          }));
+        } else if (logType === 'physique') {
+          set(state => ({
+            physiqueLogs: state.physiqueLogs.map(p =>
+              p.id === logId
+                ? { ...p, comments: [...(p.comments || []), newComment] }
+                : p
+            ),
+          }));
+        }
+      },
+
+      updateLogCoachReview: (logType, logId, status, remarks) => {
+        if (logType === 'food') {
+          set(state => ({
+            foodLogs: state.foodLogs.map(f =>
+              f.id === logId
+                ? { ...f, coachStatus: status, ...(remarks ? { coachRemarks: remarks } : {}) }
+                : f
+            ),
+          }));
+        } else if (logType === 'workout') {
+          set(state => ({
+            workouts: state.workouts.map(w =>
+              w.id === logId
+                ? { ...w, coachStatus: status, ...(remarks ? { coachRemarks: remarks } : {}) }
+                : w
+            ),
+          }));
+        } else if (logType === 'weight') {
+          set(state => ({
+            weightLogs: state.weightLogs.map(wl =>
+              wl.id === logId
+                ? { ...wl, coachStatus: status, ...(remarks ? { coachRemarks: remarks } : {}) }
+                : wl
+            ),
+          }));
+        } else if (logType === 'physique') {
+          set(state => ({
+            physiqueLogs: state.physiqueLogs.map(p =>
+              p.id === logId
+                ? { ...p, coachStatus: status, ...(remarks ? { coachFeedback: remarks } : {}), reviewedByCoach: true }
+                : p
+            ),
+          }));
+        }
+      },
+
+      // ── Food & Nutrition (Editable / Deletable / Addable Database) ───────────
       foodDatabase: initialFoodDatabase,
       foodLogs: initialFoodLogs,
       waterIntakeTodayMl: 2500,
 
+      addFoodItem: food => {
+        const newFood: FoodItem = {
+          ...food,
+          id: `food_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        };
+        set(state => ({ foodDatabase: [newFood, ...state.foodDatabase] }));
+        return newFood;
+      },
+
+      updateFoodItem: (id, updates) => {
+        set(state => ({
+          foodDatabase: state.foodDatabase.map(f => (f.id === id ? { ...f, ...updates } : f)),
+        }));
+      },
+
+      deleteFoodItem: id => {
+        set(state => ({
+          foodDatabase: state.foodDatabase.filter(f => f.id !== id),
+        }));
+      },
+
       addFoodLog: entry => {
         const newLog: FoodLogEntry = {
           ...entry,
-          id: `food_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          id: `food_log_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
           loggedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
         set(state => ({ foodLogs: [newLog, ...state.foodLogs] }));
@@ -377,7 +600,7 @@ export const useFitnessStore = create<FitnessState>()(
       addCoachPhysiqueFeedback: (entryId, feedback) => {
         set(state => ({
           physiqueLogs: state.physiqueLogs.map(p =>
-            p.id === entryId ? { ...p, coachFeedback: feedback, reviewedByCoach: true } : p
+            p.id === entryId ? { ...p, coachFeedback: feedback, reviewedByCoach: true, coachStatus: 'reviewed' } : p
           ),
         }));
       },
@@ -489,7 +712,6 @@ export const useFitnessStore = create<FitnessState>()(
           const updatedClients = state.coachClients.map(c =>
             c.clientId === clientId ? { ...c, ...updates } : c
           );
-          // If editing Alex Rivers, update current user targets as well
           let updatedUser = state.currentUser;
           if (state.currentUser.id === clientId) {
             updatedUser = {
@@ -513,7 +735,7 @@ export const useFitnessStore = create<FitnessState>()(
 
       openPaymentModal: plan => {
         set({
-          selectedPaymentPlan: plan || initialPaymentPlans[2], // Default to Elite Coach Pat
+          selectedPaymentPlan: plan || initialPaymentPlans[2],
           isPaymentModalOpen: true,
         });
       },
@@ -532,7 +754,6 @@ export const useFitnessStore = create<FitnessState>()(
         };
 
         set(state => {
-          // Upgrade tier on current user
           let tier: 'basic' | 'pro' | 'elite' = 'basic';
           if (tx.planId.includes('elite')) tier = 'elite';
           else if (tx.planId.includes('pro')) tier = 'pro';
@@ -552,7 +773,7 @@ export const useFitnessStore = create<FitnessState>()(
         return newTx;
       },
 
-      // ── Coach Pat QR Donation ───────────────────────────────────────────────
+      // ── Coach Pat QR Donation (Hidden from active UI) ───────────────────────
       coachPatQrConfig: {
         payeeName: 'Coach Pat (Patrick Vance)',
         gcashNumber: '+63 917 888 2488',
@@ -561,7 +782,7 @@ export const useFitnessStore = create<FitnessState>()(
         cashAppTag: '$CoachPatBuild',
         upiId: 'coachpat@okaxis',
         paypalEmail: 'pat.coaching@ironpulse.fitness',
-        note: 'Direct athlete donations & coaching tips support workout programming, camera gear, and free fitness resources.',
+        note: 'Direct athlete donations & coaching tips.',
       },
 
       updateCoachPatQrConfig: config => {
@@ -625,7 +846,7 @@ export const useFitnessStore = create<FitnessState>()(
       setActiveQuickAddTab: tab => set({ activeQuickAddTab: tab }),
     }),
     {
-      name: 'fitness-coach-tracker-storage-v3',
+      name: 'fitness-coach-tracker-storage-v4',
     }
   )
 );

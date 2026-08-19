@@ -54,8 +54,33 @@ export interface FoodItem {
   isCustom?: boolean;
 }
 
+export interface LogComment {
+  id: string;
+  authorId: string;
+  authorName: string;
+  authorRole: AppRole;
+  authorAvatar?: string;
+  text: string;
+  createdAt: string;
+}
+
+export interface AssignedTask {
+  id: string;
+  clientId: string;
+  title: string;
+  description: string;
+  category: 'workout' | 'nutrition' | 'habit' | 'meetup' | 'recovery';
+  dueDate: string;
+  assignedBy: string;
+  completed: boolean;
+  completedAt?: string;
+  coachRemarks?: string;
+  priority: 'low' | 'medium' | 'high';
+}
+
 export interface FoodLogEntry {
   id: string;
+  clientId?: string;
   date: string; // YYYY-MM-DD
   mealCategory: MealCategory;
   food: FoodItem;
@@ -66,6 +91,9 @@ export interface FoodLogEntry {
   totalFat: number;
   totalFiber: number;
   loggedAt: string;
+  coachStatus?: 'pending' | 'reviewed' | 'completed';
+  coachRemarks?: string;
+  comments?: LogComment[];
 }
 
 export interface DailyNutritionLog {
@@ -79,6 +107,7 @@ export interface DailyNutritionLog {
 
 export interface PhysiqueEntry {
   id: string;
+  clientId?: string;
   date: string; // YYYY-MM-DD
   weekNumber: number;
   frontPhoto: string;
@@ -100,17 +129,23 @@ export interface PhysiqueEntry {
   notes: string;
   coachFeedback?: string;
   reviewedByCoach?: boolean;
+  coachStatus?: 'pending' | 'reviewed' | 'completed';
+  comments?: LogComment[];
 }
 
 // ── Weight Tracking ───────────────────────────────────────────────────────────
 
 export interface BodyWeightLog {
   id: string;
+  clientId?: string;
   date: string; // YYYY-MM-DD
   weightKg: number;
   timeOfDay: 'morning' | 'evening';
   notes?: string;
   bmi?: number;
+  coachStatus?: 'pending' | 'reviewed' | 'completed';
+  coachRemarks?: string;
+  comments?: LogComment[];
 }
 
 // ── Weightlifting & Workouts ──────────────────────────────────────────────────
@@ -145,6 +180,7 @@ export interface WorkoutExerciseLog {
 
 export interface WorkoutSession {
   id: string;
+  clientId?: string;
   date: string; // YYYY-MM-DD
   title: string;
   splitType: SplitType;
@@ -156,6 +192,9 @@ export interface WorkoutSession {
   energyLevel: 1 | 2 | 3 | 4 | 5;
   notes?: string;
   completed: boolean;
+  coachStatus?: 'pending' | 'reviewed' | 'completed';
+  coachRemarks?: string;
+  comments?: LogComment[];
 }
 
 // ── Exercise Library & Form Correction ────────────────────────────────────────

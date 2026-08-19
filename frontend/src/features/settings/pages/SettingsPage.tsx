@@ -167,104 +167,13 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* ── Coach Pat QR Donation Settings ──────────────────────────────────── */}
-      <form onSubmit={handleSaveQrConfig} className="card card-glow-cyan" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-          <div>
-            <h3 className="card-title">
-              <span>💖</span> Coach Pat QR & Donation Details
-            </h3>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-              Configure direct QR payment handles shown on the "Donate / Tip Coach Pat" modal
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={openDonateModal}
-            className="btn btn-donate btn-sm"
-          >
-            Preview Donate QR Modal ➔
-          </button>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
-              Payee Display Name
-            </label>
-            <input type="text" value={payeeName} onChange={e => setPayeeName(e.target.value)} required />
-          </div>
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
-              GCash Mobile Number
-            </label>
-            <input type="text" value={gcash} onChange={e => setGcash(e.target.value)} required />
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
-              PromptPay ID
-            </label>
-            <input type="text" value={promptPay} onChange={e => setPromptPay(e.target.value)} />
-          </div>
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
-              Venmo Handle
-            </label>
-            <input type="text" value={venmo} onChange={e => setVenmo(e.target.value)} />
-          </div>
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
-              Cash App ($Cashtag)
-            </label>
-            <input type="text" value={cashApp} onChange={e => setCashApp(e.target.value)} />
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
-              UPI VPA Address
-            </label>
-            <input type="text" value={upi} onChange={e => setUpi(e.target.value)} />
-          </div>
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
-              PayPal Email
-            </label>
-            <input type="email" value={paypal} onChange={e => setPaypal(e.target.value)} />
-          </div>
-        </div>
-
-        <div>
-          <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
-            Coach Pat Appreciation Note
-          </label>
-          <textarea rows={2} value={qrNote} onChange={e => setQrNote(e.target.value)} />
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button type="submit" className="btn btn-cyan">
-            Save QR Donation Config
-          </button>
-          {qrSuccessToast && (
-            <span style={{ fontSize: 13, color: 'var(--color-primary)', fontWeight: 700 }}>
-              ✓ Coach Pat QR details updated!
-            </span>
-          )}
-        </div>
-      </form>
-
       {/* ── Role Switcher Card ──────────────────────────────────────────────── */}
       <div className="card">
         <h3 className="card-title" style={{ marginBottom: 10 }}>
           <span>👥</span> Role Switcher (Password Protected)
         </h3>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14 }}>
-          Switching roles requires entering that account's security password or PIN.
+          Switching accounts requires entering the target account's security password or PIN.
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
@@ -277,7 +186,7 @@ export default function SettingsPage() {
             <span>🏃</span>
             <div style={{ textAlign: 'left' }}>
               <div style={{ fontWeight: 700 }}>Athlete (Alex Rivers)</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Password: <code>fitness123</code></div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Self-tracking mode</div>
             </div>
           </button>
 
@@ -290,7 +199,7 @@ export default function SettingsPage() {
             <span>👑</span>
             <div style={{ textAlign: 'left' }}>
               <div style={{ fontWeight: 700 }}>Head Coach (Coach Pat)</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Password: <code>coach123</code></div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Admin & client review</div>
             </div>
           </button>
 
@@ -303,7 +212,7 @@ export default function SettingsPage() {
             <span>🛡️</span>
             <div style={{ textAlign: 'left' }}>
               <div style={{ fontWeight: 700 }}>Staff Trainer (Sarah)</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Password: <code>staff123</code></div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Performance specialist</div>
             </div>
           </button>
         </div>

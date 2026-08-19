@@ -137,7 +137,7 @@ export default function RolePasswordModal() {
             <div style={{ position: 'relative' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
-                placeholder={`Enter password (e.g. ${defaultHint})...`}
+                placeholder="Enter account password..."
                 value={password}
                 onChange={e => {
                   setPassword(e.target.value);
@@ -165,29 +165,6 @@ export default function RolePasswordModal() {
                 {showPassword ? '👁️' : '🙈'}
               </button>
             </div>
-          </div>
-
-          {/* Quick Demo Fill Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>Demo Quick Passwords:</span>
-            <button
-              type="button"
-              onClick={() => handleUseHint(defaultHint)}
-              className="badge badge-emerald"
-              style={{ cursor: 'pointer', border: '1px dashed var(--color-primary)' }}
-            >
-              Auto-fill: <code>{defaultHint}</code>
-            </button>
-            {targetRoleToSwitch === 'coach' && (
-              <button
-                type="button"
-                onClick={() => handleUseHint('admin123')}
-                className="badge badge-rose"
-                style={{ cursor: 'pointer' }}
-              >
-                Auto-fill: <code>admin123</code>
-              </button>
-            )}
           </div>
 
           {errorMsg && (

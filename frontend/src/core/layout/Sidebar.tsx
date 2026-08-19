@@ -173,31 +173,6 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Donate Button in Sidebar */}
-      {!sidebarCollapsed ? (
-        <div style={{ padding: '0 10px 10px 10px' }}>
-          <button
-            onClick={openDonateModal}
-            className="btn btn-donate"
-            style={{ width: '100%', fontSize: 12, padding: '9px 12px' }}
-          >
-            <span>💖</span>
-            <span>Tip Coach Pat QR</span>
-          </button>
-        </div>
-      ) : (
-        <div style={{ padding: '0 10px 10px 10px', display: 'flex', justifyContent: 'center' }}>
-          <button
-            onClick={openDonateModal}
-            className="btn-icon btn-donate"
-            style={{ width: 38, height: 38, borderRadius: 'var(--radius-md)' }}
-            title="Donate / Tip Coach Pat"
-          >
-            <span>💖</span>
-          </button>
-        </div>
-      )}
-
       {/* Footer Collapse Toggle */}
       <div style={{ padding: '10px 10px', borderTop: '1px solid var(--border-subtle)' }}>
         <button

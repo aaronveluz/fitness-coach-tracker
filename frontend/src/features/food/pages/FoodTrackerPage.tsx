@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // frontend/src/features/food/pages/FoodTrackerPage.tsx
-// Comprehensive Food Tracker with Macro/Micro Breakdown & Searchable Database
+// Comprehensive Food Tracker with Macro/Micro Breakdown & Searchable/Editable Database
 // ─────────────────────────────────────────────────────────────────────────────
 
 import React, { useState } from 'react';
@@ -14,16 +14,28 @@ export default function FoodTrackerPage() {
     foodDatabase,
     addFoodLog,
     deleteFoodLog,
+    addFoodItem,
+    updateFoodItem,
+    deleteFoodItem,
     addCustomFood,
+    addLogComment,
+    updateLogCoachReview,
     waterIntakeTodayMl,
     logWater,
   } = useFitnessStore();
+
+  const isCoachOrStaff = currentUser.role === 'coach' || currentUser.role === 'staff';
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   const [activeModalMeal, setActiveModalMeal] = useState<MealCategory | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
   const [servings, setServings] = useState(1);
+
+  // Food Database Management Modal State
+  const [isDbManagerOpen, setIsDbManagerOpen] = useState(false);
+  const [dbSearchQuery, setDbSearchQuery] = useState('');
+  const [editingDbFood, setEditingDbFood] = useState<FoodItem | null>(null);
 
   // Custom Food Form State
   const [isCustomFoodModalOpen, setIsCustomFoodModalOpen] = useState(false);
@@ -36,6 +48,11 @@ export default function FoodTrackerPage() {
   const [customCarbs, setCustomCarbs] = useState(15);
   const [customFat, setCustomFat] = useState(5);
   const [customFiber, setCustomFiber] = useState(3);
+
+  // Active Comment Thread state
+  const [activeCommentLogId, setActiveCommentLogId] = useState<string | null>(null);
+  const [newCommentText, setNewCommentText] = useState('');
+  const [coachRemarkInput, setCoachRemarkInput] = useState<{ [logId: string]: string }>({});
 
   // Filter logs by selected date
   const logsForDate = foodLogs.filter(f => f.date === selectedDate);
@@ -77,27 +94,65 @@ export default function FoodTrackerPage() {
     setSearchQuery('');
   };
 
-  const handleCreateCustomFood = (e: React.FormEvent) => {
+  const handleSaveDbFood = (e: React.FormEvent) => {
     e.preventDefault();
     if (!customName.trim()) return;
 
-    const newFood = addCustomFood({
-      name: customName.trim(),
-      brand: customBrand.trim() || 'Custom',
-      servingSize: Number(customServingSize),
-      servingUnit: customServingUnit,
-      calories: Number(customCalories),
-      protein: Number(customProtein),
-      carbs: Number(customCarbs),
-      fat: Number(customFat),
-      fiber: Number(customFiber),
-    });
+    if (editingDbFood) {
+      updateFoodItem(editingDbFood.id, {
+        name: customName.trim(),
+        brand: customBrand.trim() || 'Generic',
+        servingSize: Number(customServingSize),
+        servingUnit: customServingUnit,
+        calories: Number(customCalories),
+        protein: Number(customProtein),
+        carbs: Number(customCarbs),
+        fat: Number(customFat),
+        fiber: Number(customFiber),
+      });
+      setEditingDbFood(null);
+    } else {
+      addFoodItem({
+        name: customName.trim(),
+        brand: customBrand.trim() || 'Custom / Verified',
+        servingSize: Number(customServingSize),
+        servingUnit: customServingUnit,
+        calories: Number(customCalories),
+        protein: Number(customProtein),
+        carbs: Number(customCarbs),
+        fat: Number(customFat),
+        fiber: Number(customFiber),
+      });
+    }
 
     setIsCustomFoodModalOpen(false);
-    setSelectedFood(newFood);
-    // Reset form
     setCustomName('');
     setCustomBrand('');
+  };
+
+  const handleOpenEditDbFood = (food: FoodItem) => {
+    setEditingDbFood(food);
+    setCustomName(food.name);
+    setCustomBrand(food.brand || '');
+    setCustomServingSize(food.servingSize);
+    setCustomServingUnit(food.servingUnit);
+    setCustomCalories(food.calories);
+    setCustomProtein(food.protein);
+    setCustomCarbs(food.carbs);
+    setCustomFat(food.fat);
+    setCustomFiber(food.fiber);
+    setIsCustomFoodModalOpen(true);
+  };
+
+  const handleAddComment = (logId: string) => {
+    if (!newCommentText.trim()) return;
+    addLogComment('food', logId, newCommentText);
+    setNewCommentText('');
+  };
+
+  const handleCoachTagReview = (logId: string, status: 'reviewed' | 'completed') => {
+    const remark = coachRemarkInput[logId] || (status === 'completed' ? 'Verified by Coach Pat. Macros on target.' : 'Reviewed by Coach Pat.');
+    updateLogCoachReview('food', logId, status, remark);
   };
 
   const filteredFoods = foodDatabase.filter(
@@ -106,204 +161,319 @@ export default function FoodTrackerPage() {
       (f.brand && f.brand.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  const filteredDbFoods = foodDatabase.filter(
+    f =>
+      f.name.toLowerCase().includes(dbSearchQuery.toLowerCase()) ||
+      (f.brand && f.brand.toLowerCase().includes(dbSearchQuery.toLowerCase()))
+  );
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      {/* ── Header & Date Bar ────────────────────────────────────────────────── */}
+      {/* ── Header & Actions ─────────────────────────────────────────────────── */}
       <div className="page-header">
         <div>
           <h1 className="page-title">
             <span>Food & Daily Nutrition</span>
             <span style={{ fontSize: 24 }}>🥗</span>
           </h1>
-          <p className="page-subtitle">Track meals, macronutrient distribution, and hydration</p>
+          <p className="page-subtitle">Track daily meals, adjust calorie & macro databases, and review coach remarks</p>
         </div>
 
-        {/* Date Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-card)', padding: '6px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Date:</span>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <input
             type="date"
             value={selectedDate}
             onChange={e => setSelectedDate(e.target.value)}
-            style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: 13, fontWeight: 700, padding: 0, width: 'auto' }}
+            style={{ width: 'auto' }}
           />
+
+          <button className="btn btn-secondary btn-sm" onClick={() => setIsDbManagerOpen(true)}>
+            <span>⚙️</span> Manage Food & Calorie Database
+          </button>
+
           <button
-            onClick={() => setSelectedDate(new Date().toISOString().slice(0, 10))}
-            className="btn btn-secondary btn-sm"
-            style={{ fontSize: 11, padding: '4px 8px' }}
+            className="btn btn-primary btn-sm"
+            onClick={() => {
+              setEditingDbFood(null);
+              setCustomName('');
+              setCustomBrand('');
+              setCustomServingSize(100);
+              setCustomServingUnit('g');
+              setCustomCalories(200);
+              setCustomProtein(20);
+              setCustomCarbs(20);
+              setCustomFat(5);
+              setCustomFiber(3);
+              setIsCustomFoodModalOpen(true);
+            }}
           >
-            Today
+            <span>＋</span> Create Custom Food
           </button>
         </div>
       </div>
 
-      {/* ── Macro Summary Card with Dynamic Gauges ──────────────────────────── */}
+      {/* ── Daily Macro Progress Overview ─────────────────────────────────────── */}
       <div className="card card-glow-emerald">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h3 className="card-title">
-            <span>⚡</span> Daily Macronutrient Breakdown
-          </h3>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button className="btn btn-secondary btn-sm" onClick={() => setIsCustomFoodModalOpen(true)}>
-              <span>＋</span> Custom Food Creator
-            </button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+          <div>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+              Daily Calorie & Macro Target Progress
+            </span>
+            <h2 style={{ fontSize: 28, fontWeight: 900, color: '#fff', marginTop: 4 }}>
+              {totalCalories} <span style={{ fontSize: 16, color: 'var(--text-muted)', fontWeight: 500 }}>/ {currentUser.targetCalories} kcal</span>
+            </h2>
+          </div>
+
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Calorie Remaining</div>
+              <strong style={{ fontSize: 18, color: currentUser.targetCalories - totalCalories >= 0 ? 'var(--color-primary)' : 'var(--color-rose)' }}>
+                {currentUser.targetCalories - totalCalories} kcal
+              </strong>
+            </div>
           </div>
         </div>
 
-        {/* 4 Big Macro Pill Badges */}
-        <div className="grid-4" style={{ marginBottom: 18 }}>
-          {/* Calories */}
-          <div style={{ background: 'var(--bg-card-elevated)', padding: 14, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Calories</div>
-            <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 800, color: '#10b981', marginTop: 2 }}>
-              {totalCalories} <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 400 }}>/ {currentUser.targetCalories} kcal</span>
-            </div>
-            <div className="progress-bar-track" style={{ marginTop: 8 }}>
-              <div
-                className="progress-bar-fill"
-                style={{ width: `${Math.min(100, Math.round((totalCalories / currentUser.targetCalories) * 100))}%`, background: '#10b981' }}
-              />
-            </div>
-          </div>
-
+        {/* Progress Bars */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
           {/* Protein */}
-          <div style={{ background: 'var(--bg-card-elevated)', padding: 14, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-            <div style={{ fontSize: 12, color: '#38bdf8' }}>Protein (4 kcal/g)</div>
-            <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 800, color: '#38bdf8', marginTop: 2 }}>
-              {totalProtein}g <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 400 }}>/ {currentUser.targetProteinG}g</span>
+          <div style={{ background: 'var(--bg-card-elevated)', padding: 12, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
+              <span style={{ color: '#38bdf8', fontWeight: 700 }}>🍗 Protein</span>
+              <strong>{totalProtein}g / {currentUser.targetProteinG}g</strong>
             </div>
-            <div className="progress-bar-track" style={{ marginTop: 8 }}>
-              <div
-                className="progress-bar-fill"
-                style={{ width: `${Math.min(100, Math.round((totalProtein / currentUser.targetProteinG) * 100))}%`, background: '#06b6d4' }}
-              />
+            <div className="progress-bar-container">
+              <div className="progress-bar-fill" style={{ width: `${Math.min(100, (totalProtein / currentUser.targetProteinG) * 100)}%`, background: '#38bdf8' }} />
             </div>
           </div>
 
           {/* Carbs */}
-          <div style={{ background: 'var(--bg-card-elevated)', padding: 14, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-            <div style={{ fontSize: 12, color: '#fbbf24' }}>Carbs (4 kcal/g)</div>
-            <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 800, color: '#fbbf24', marginTop: 2 }}>
-              {totalCarbs}g <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 400 }}>/ {currentUser.targetCarbsG}g</span>
+          <div style={{ background: 'var(--bg-card-elevated)', padding: 12, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
+              <span style={{ color: '#fbbf24', fontWeight: 700 }}>🍚 Carbs</span>
+              <strong>{totalCarbs}g / {currentUser.targetCarbsG}g</strong>
             </div>
-            <div className="progress-bar-track" style={{ marginTop: 8 }}>
-              <div
-                className="progress-bar-fill"
-                style={{ width: `${Math.min(100, Math.round((totalCarbs / currentUser.targetCarbsG) * 100))}%`, background: '#f59e0b' }}
-              />
+            <div className="progress-bar-container">
+              <div className="progress-bar-fill" style={{ width: `${Math.min(100, (totalCarbs / currentUser.targetCarbsG) * 100)}%`, background: '#fbbf24' }} />
             </div>
           </div>
 
           {/* Fat */}
-          <div style={{ background: 'var(--bg-card-elevated)', padding: 14, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-            <div style={{ fontSize: 12, color: '#fb7185' }}>Fats (9 kcal/g)</div>
-            <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 800, color: '#fb7185', marginTop: 2 }}>
-              {totalFat}g <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 400 }}>/ {currentUser.targetFatG}g</span>
+          <div style={{ background: 'var(--bg-card-elevated)', padding: 12, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
+              <span style={{ color: '#fb7185', fontWeight: 700 }}>🥑 Fats</span>
+              <strong>{totalFat}g / {currentUser.targetFatG}g</strong>
             </div>
-            <div className="progress-bar-track" style={{ marginTop: 8 }}>
-              <div
-                className="progress-bar-fill"
-                style={{ width: `${Math.min(100, Math.round((totalFat / currentUser.targetFatG) * 100))}%`, background: '#f43f5e' }}
-              />
+            <div className="progress-bar-container">
+              <div className="progress-bar-fill" style={{ width: `${Math.min(100, (totalFat / currentUser.targetFatG) * 100)}%`, background: '#fb7185' }} />
+            </div>
+          </div>
+
+          {/* Water */}
+          <div style={{ background: 'var(--bg-card-elevated)', padding: 12, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
+              <span style={{ color: 'var(--color-cyan)', fontWeight: 700 }}>💧 Hydration</span>
+              <strong>{(waterIntakeTodayMl / 1000).toFixed(1)}L / {(currentUser.targetWaterMl / 1000).toFixed(1)}L</strong>
+            </div>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6 }}>
+              <button onClick={() => logWater(250)} className="btn btn-secondary btn-sm" style={{ padding: '3px 8px', fontSize: 11 }}>+250ml</button>
+              <button onClick={() => logWater(500)} className="btn btn-secondary btn-sm" style={{ padding: '3px 8px', fontSize: 11 }}>+500ml</button>
             </div>
           </div>
         </div>
-
-        {/* Micronutrients row */}
-        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', fontSize: 12, color: 'var(--text-muted)', borderTop: '1px solid var(--border-subtle)', paddingTop: 12 }}>
-          <div>🌾 Fiber: <strong style={{ color: '#fff' }}>{totalFiber}g</strong> / {currentUser.targetFiberG}g</div>
-          <div>💧 Water: <strong style={{ color: '#38bdf8' }}>{waterIntakeTodayMl} ml</strong> / {currentUser.targetWaterMl} ml</div>
-          <div>🧂 Sodium: <strong style={{ color: '#fff' }}>~1,840 mg</strong></div>
-          <div>🍌 Potassium: <strong style={{ color: '#fff' }}>~2,950 mg</strong></div>
-        </div>
       </div>
 
-      {/* ── Meal Categories Logs ────────────────────────────────────────────── */}
+      {/* ── Meal Logs List ───────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {mealCategories.map(cat => {
-          const catLogs = logsForDate.filter(f => f.mealCategory === cat.key);
-          const catCalories = catLogs.reduce((sum, f) => sum + f.totalCalories, 0);
-          const catProtein = catLogs.reduce((sum, f) => sum + f.totalProtein, 0).toFixed(1);
-          const catCarbs = catLogs.reduce((sum, f) => sum + f.totalCarbs, 0).toFixed(1);
-          const catFat = catLogs.reduce((sum, f) => sum + f.totalFat, 0).toFixed(1);
+          const mealLogs = logsForDate.filter(f => f.mealCategory === cat.key);
+          const mealCals = mealLogs.reduce((sum, f) => sum + f.totalCalories, 0);
 
           return (
-            <div key={cat.key} className="card">
-              {/* Category Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <div key={cat.key} className="card" style={{ padding: 18 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 20 }}>{cat.icon}</span>
+                  <span style={{ fontSize: 22 }}>{cat.icon}</span>
                   <div>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{cat.label}</h3>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                      {catCalories} kcal • P: {catProtein}g • C: {catCarbs}g • F: {catFat}g
+                    <h3 style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>{cat.label}</h3>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                      {mealLogs.length} items logged • {mealCals} kcal
                     </div>
                   </div>
                 </div>
 
                 <button
-                  className="btn btn-secondary btn-sm"
                   onClick={() => {
                     setActiveModalMeal(cat.key);
                     setSelectedFood(null);
+                    setServings(1);
                     setSearchQuery('');
                   }}
+                  className="btn btn-secondary btn-sm"
+                  style={{ fontSize: 12 }}
                 >
                   <span>＋</span> Add Food
                 </button>
               </div>
 
-              {/* Logged items list */}
-              {catLogs.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {catLogs.map(item => (
+              {/* Logged items */}
+              {mealLogs.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '16px 0', color: 'var(--text-subtle)', fontSize: 12, borderTop: '1px dashed var(--border-subtle)' }}>
+                  No food items logged for {cat.label.toLowerCase()} yet.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, borderTop: '1px solid var(--border-subtle)', paddingTop: 12 }}>
+                  {mealLogs.map(log => (
                     <div
-                      key={item.id}
+                      key={log.id}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '10px 14px',
-                        borderRadius: 'var(--radius-md)',
                         background: 'var(--bg-card-elevated)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '12px 14px',
                         border: '1px solid var(--border-subtle)',
                       }}
                     >
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: 13, color: '#fff' }}>
-                          {item.food.name}
-                          {item.food.brand && item.food.brand !== 'Generic' && (
-                            <span style={{ fontSize: 11, color: 'var(--text-subtle)', marginLeft: 6 }}>
-                              ({item.food.brand})
-                            </span>
-                          )}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <strong style={{ fontSize: 14, color: 'var(--text-main)' }}>{log.food.name}</strong>
+                            {log.food.brand && <span className="badge badge-cyan" style={{ fontSize: 9 }}>{log.food.brand}</span>}
+                            {log.coachStatus === 'completed' && (
+                              <span className="badge badge-emerald" style={{ fontSize: 9 }}>✓ Verified by Coach Pat</span>
+                            )}
+                            {log.coachStatus === 'reviewed' && (
+                              <span className="badge badge-rose" style={{ fontSize: 9 }}>Reviewed by Coach</span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+                            {log.servings} × {log.food.servingSize}{log.food.servingUnit} • Logged at {log.loggedAt}
+                          </div>
                         </div>
-                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                          {item.servings} serving ({item.food.servingSize * item.servings} {item.food.servingUnit}) •{' '}
-                          <span style={{ color: '#38bdf8' }}>P: {item.totalProtein}g</span> •{' '}
-                          <span style={{ color: '#fbbf24' }}>C: {item.totalCarbs}g</span> •{' '}
-                          <span style={{ color: '#fb7185' }}>F: {item.totalFat}g</span>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontWeight: 800, color: 'var(--color-primary)', fontSize: 15 }}>
+                              {log.totalCalories} kcal
+                            </div>
+                            <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
+                              {log.totalProtein}g P | {log.totalCarbs}g C | {log.totalFat}g F
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => deleteFoodLog(log.id)}
+                            className="btn-icon"
+                            style={{ width: 28, height: 28, color: 'var(--color-rose)', fontSize: 13 }}
+                            title="Delete log entry"
+                          >
+                            ✕
+                          </button>
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 14, color: 'var(--color-primary)' }}>
-                          {item.totalCalories} kcal
-                        </span>
-                        <button
-                          onClick={() => deleteFoodLog(item.id)}
-                          style={{ color: 'var(--color-danger)', fontSize: 14, padding: 4, cursor: 'pointer' }}
-                          title="Delete food entry"
+                      {/* Coach Pat Remarks */}
+                      {log.coachRemarks && (
+                        <div
+                          style={{
+                            marginTop: 8,
+                            padding: '6px 10px',
+                            borderRadius: 'var(--radius-sm)',
+                            background: 'rgba(244, 63, 94, 0.12)',
+                            borderLeft: '3px solid var(--color-rose)',
+                            fontSize: 12,
+                            color: '#fda4af',
+                          }}
                         >
-                          ✕
-                        </button>
+                          <strong>Coach Pat Remark:</strong> {log.coachRemarks}
+                        </div>
+                      )}
+
+                      {/* Coach Action Buttons for Coach/Staff */}
+                      {isCoachOrStaff && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, borderTop: '1px dashed var(--border-subtle)', paddingTop: 8 }}>
+                          <input
+                            type="text"
+                            placeholder="Add Coach remark (e.g. Great protein pacing)..."
+                            value={coachRemarkInput[log.id] || ''}
+                            onChange={e => setCoachRemarkInput({ ...coachRemarkInput, [log.id]: e.target.value })}
+                            style={{ flex: 1, padding: '4px 8px', fontSize: 11 }}
+                          />
+                          <button
+                            onClick={() => handleCoachTagReview(log.id, 'reviewed')}
+                            className="btn btn-secondary btn-sm"
+                            style={{ fontSize: 10, padding: '4px 8px' }}
+                          >
+                            Mark Reviewed
+                          </button>
+                          <button
+                            onClick={() => handleCoachTagReview(log.id, 'completed')}
+                            className="btn btn-primary btn-sm"
+                            style={{ fontSize: 10, padding: '4px 8px' }}
+                          >
+                            ✓ Tag Completed
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Comments Thread */}
+                      {log.comments && log.comments.length > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8, paddingLeft: 10, borderLeft: '2px solid var(--border-medium)' }}>
+                          {log.comments.map(c => (
+                            <div key={c.id} style={{ fontSize: 11 }}>
+                              <strong style={{ color: c.authorRole === 'coach' ? 'var(--color-rose)' : 'var(--color-primary)' }}>
+                                {c.authorName}:
+                              </strong>{' '}
+                              <span style={{ color: 'var(--text-muted)' }}>{c.text}</span>
+                              <span style={{ fontSize: 9, color: 'var(--text-subtle)', marginLeft: 6 }}>({c.createdAt})</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Add comment trigger */}
+                      <div style={{ marginTop: 8 }}>
+                        {activeCommentLogId === log.id ? (
+                          <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                            <input
+                              type="text"
+                              placeholder="Write a comment / question..."
+                              value={newCommentText}
+                              onChange={e => setNewCommentText(e.target.value)}
+                              style={{ flex: 1, padding: '4px 8px', fontSize: 11 }}
+                              autoFocus
+                            />
+                            <button
+                              onClick={() => {
+                                handleAddComment(log.id);
+                                setActiveCommentLogId(null);
+                              }}
+                              className="btn btn-primary btn-sm"
+                              style={{ fontSize: 11 }}
+                            >
+                              Post
+                            </button>
+                            <button
+                              onClick={() => setActiveCommentLogId(null)}
+                              className="btn btn-secondary btn-sm"
+                              style={{ fontSize: 11 }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setActiveCommentLogId(log.id);
+                              setNewCommentText('');
+                            }}
+                            style={{ background: 'none', border: 'none', color: 'var(--text-subtle)', fontSize: 11, cursor: 'pointer', padding: 0 }}
+                          >
+                            💬 Comment on meal
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
-                </div>
-              ) : (
-                <div style={{ padding: '16px 0', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>
-                  No items logged for {cat.label.toLowerCase()} yet.
                 </div>
               )}
             </div>
@@ -311,35 +481,30 @@ export default function FoodTrackerPage() {
         })}
       </div>
 
-      {/* ── Modal: Add Food from Database ────────────────────────────────────── */}
+      {/* ── Modal: Add Food to Log ────────────────────────────────────────────── */}
       {activeModalMeal && (
         <div className="modal-backdrop" onClick={() => setActiveModalMeal(null)}>
-          <div className="modal-dialog" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
+          <div className="modal-dialog" onClick={e => e.stopPropagation()} style={{ maxWidth: 540 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <div>
-                <h3 style={{ fontSize: 18, fontWeight: 800 }}>
-                  Add to {activeModalMeal.toUpperCase()}
-                </h3>
-                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Choose from 40+ verified fitness food items or search</p>
-              </div>
-              <button onClick={() => setActiveModalMeal(null)} className="btn-icon" style={{ width: 32, height: 32 }}>
-                ✕
-              </button>
+              <h3 style={{ fontSize: 18, fontWeight: 800, textTransform: 'capitalize' }}>
+                Add to {activeModalMeal}
+              </h3>
+              <button onClick={() => setActiveModalMeal(null)} className="btn-icon" style={{ width: 32, height: 32 }}>✕</button>
             </div>
 
-            {/* Search input */}
-            <input
-              type="text"
-              placeholder="Search chicken breast, oats, whey, salmon..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              style={{ marginBottom: 14 }}
-              autoFocus
-            />
+            <form onSubmit={handleAddFoodToMeal} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Search food database (e.g. Chicken, Whey, Rice)..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  autoFocus
+                />
+              </div>
 
-            {!selectedFood ? (
-              /* Search Results List */
-              <div style={{ maxHeight: 320, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {/* Food List Selection */}
+              <div style={{ maxHeight: 220, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {filteredFoods.map(food => (
                   <div
                     key={food.id}
@@ -347,113 +512,211 @@ export default function FoodTrackerPage() {
                     style={{
                       padding: '10px 12px',
                       borderRadius: 'var(--radius-sm)',
-                      background: 'var(--bg-card-elevated)',
-                      border: '1px solid var(--border-subtle)',
-                      cursor: 'pointer',
+                      background: selectedFood?.id === food.id ? 'var(--color-primary-light)' : 'var(--bg-card-elevated)',
+                      border: selectedFood?.id === food.id ? '1px solid var(--color-primary)' : '1px solid var(--border-subtle)',
                       display: 'flex',
-                      alignItems: 'center',
                       justifyContent: 'space-between',
-                      transition: 'border-color var(--transition-fast)',
+                      alignItems: 'center',
+                      cursor: 'pointer',
                     }}
                   >
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: '#fff' }}>{food.name}</div>
+                      <strong style={{ fontSize: 13, color: '#fff' }}>{food.name}</strong>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                        Per {food.servingSize} {food.servingUnit} • P: {food.protein}g, C: {food.carbs}g, F: {food.fat}g
+                        {food.servingSize}{food.servingUnit} • {food.protein}g P | {food.carbs}g C | {food.fat}g F
                       </div>
                     </div>
-
-                    <span style={{ fontWeight: 800, fontSize: 13, color: 'var(--color-primary)' }}>
-                      {food.calories} kcal
-                    </span>
+                    <strong style={{ fontSize: 14, color: 'var(--color-primary)' }}>{food.calories} kcal</strong>
                   </div>
                 ))}
               </div>
-            ) : (
-              /* Servings Configuration */
-              <form onSubmit={handleAddFoodToMeal} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div style={{ background: 'var(--bg-card-elevated)', padding: 14, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-                  <div style={{ fontWeight: 800, fontSize: 16, color: '#fff' }}>{selectedFood.name}</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                    Base Serving: {selectedFood.servingSize} {selectedFood.servingUnit} ({selectedFood.calories} kcal)
-                  </div>
-                </div>
 
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>
-                    Number of Servings (e.g. 1.5 = {selectedFood.servingSize * (servings || 1)} {selectedFood.servingUnit})
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    min="0.1"
-                    value={servings}
-                    onChange={e => setServings(parseFloat(e.target.value) || 1)}
-                    required
-                    style={{ fontSize: 18, fontWeight: 800 }}
-                  />
-                </div>
+              {selectedFood && (
+                <div style={{ background: 'var(--bg-card-elevated)', padding: 12, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-medium)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <strong style={{ fontSize: 13 }}>Selected: {selectedFood.name}</strong>
+                    <span style={{ fontSize: 12, color: 'var(--color-primary)', fontWeight: 700 }}>
+                      {Math.round(selectedFood.calories * servings)} kcal Total
+                    </span>
+                  </div>
 
-                {/* Macro calculated breakdown */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, textAlign: 'center', background: 'rgba(255,255,255,0.03)', padding: 10, borderRadius: 'var(--radius-sm)' }}>
-                  <div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Calories</div>
-                    <div style={{ fontWeight: 800, color: '#10b981' }}>{Math.round(selectedFood.calories * servings)}</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 11, color: '#38bdf8' }}>Protein</div>
-                    <div style={{ fontWeight: 800, color: '#38bdf8' }}>{(selectedFood.protein * servings).toFixed(1)}g</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 11, color: '#fbbf24' }}>Carbs</div>
-                    <div style={{ fontWeight: 800, color: '#fbbf24' }}>{(selectedFood.carbs * servings).toFixed(1)}g</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 11, color: '#fb7185' }}>Fat</div>
-                    <div style={{ fontWeight: 800, color: '#fb7185' }}>{(selectedFood.fat * servings).toFixed(1)}g</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Servings:</label>
+                    <input
+                      type="number"
+                      step="0.25"
+                      min="0.25"
+                      value={servings}
+                      onChange={e => setServings(parseFloat(e.target.value) || 1)}
+                      style={{ width: 80 }}
+                    />
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                      = {Math.round(selectedFood.servingSize * servings)}{selectedFood.servingUnit}
+                    </span>
                   </div>
                 </div>
+              )}
 
-                <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-                  <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
-                    Add to {activeModalMeal}
-                  </button>
-                  <button type="button" onClick={() => setSelectedFood(null)} className="btn btn-secondary">
-                    Back to List
-                  </button>
-                </div>
-              </form>
-            )}
+              <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                <button type="button" onClick={() => setActiveModalMeal(null)} className="btn btn-secondary" style={{ flex: 1 }}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={!selectedFood} className="btn btn-primary" style={{ flex: 2 }}>
+                  Log Food to {activeModalMeal}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
-      {/* ── Modal: Custom Food Creator ───────────────────────────────────────── */}
+      {/* ── Modal: Manage Master Food & Calorie Database (Edit/Delete/Add) ───── */}
+      {isDbManagerOpen && (
+        <div className="modal-backdrop" onClick={() => setIsDbManagerOpen(false)}>
+          <div className="modal-dialog" onClick={e => e.stopPropagation()} style={{ maxWidth: 840, width: '90%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <div>
+                <h3 style={{ fontSize: 20, fontWeight: 900 }}>
+                  <span>⚙️</span> Food & Calorie Database Manager
+                </h3>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                  Admin & user database control — Edit food macro values, adjust calorie counts, or delete items
+                </p>
+              </div>
+              <button onClick={() => setIsDbManagerOpen(false)} className="btn-icon" style={{ width: 32, height: 32 }}>✕</button>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, marginBottom: 14 }}>
+              <input
+                type="text"
+                placeholder="Search food database to edit or delete..."
+                value={dbSearchQuery}
+                onChange={e => setDbSearchQuery(e.target.value)}
+                style={{ flex: 1 }}
+              />
+              <button
+                onClick={() => {
+                  setEditingDbFood(null);
+                  setCustomName('');
+                  setCustomBrand('');
+                  setCustomServingSize(100);
+                  setCustomServingUnit('g');
+                  setCustomCalories(200);
+                  setCustomProtein(20);
+                  setCustomCarbs(20);
+                  setCustomFat(5);
+                  setCustomFiber(3);
+                  setIsCustomFoodModalOpen(true);
+                }}
+                className="btn btn-primary btn-sm"
+              >
+                <span>＋</span> Add New Master Food
+              </button>
+            </div>
+
+            {/* Foods Table */}
+            <div style={{ maxHeight: 360, overflowY: 'auto', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ background: 'var(--bg-card-elevated)', borderBottom: '1px solid var(--border-medium)', color: 'var(--text-muted)' }}>
+                    <th style={{ padding: 10 }}>Food Name</th>
+                    <th style={{ padding: 10 }}>Serving</th>
+                    <th style={{ padding: 10 }}>Calories</th>
+                    <th style={{ padding: 10 }}>Macros (P/C/F)</th>
+                    <th style={{ padding: 10, textAlign: 'right' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredDbFoods.map(food => (
+                    <tr key={food.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                      <td style={{ padding: '10px 12px' }}>
+                        <strong>{food.name}</strong>
+                        {food.brand && <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{food.brand}</div>}
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>{food.servingSize} {food.servingUnit}</td>
+                      <td style={{ padding: '10px 12px', fontWeight: 800, color: 'var(--color-primary)' }}>
+                        {food.calories} kcal
+                      </td>
+                      <td style={{ padding: '10px 12px', fontSize: 11 }}>
+                        <span style={{ color: '#38bdf8' }}>{food.protein}g P</span> |{' '}
+                        <span style={{ color: '#fbbf24' }}>{food.carbs}g C</span> |{' '}
+                        <span style={{ color: '#fb7185' }}>{food.fat}g F</span>
+                      </td>
+                      <td style={{ padding: '10px 12px', textAlign: 'right' }}>
+                        <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                          <button
+                            onClick={() => handleOpenEditDbFood(food)}
+                            className="btn btn-secondary btn-sm"
+                            style={{ fontSize: 11, padding: '4px 8px' }}
+                            title="Edit calories and macros"
+                          >
+                            ✏️ Edit
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm(`Are you sure you want to delete ${food.name} from the database?`)) {
+                                deleteFoodItem(food.id);
+                              }
+                            }}
+                            className="btn btn-secondary btn-sm"
+                            style={{ fontSize: 11, padding: '4px 8px', color: 'var(--color-rose)' }}
+                            title="Delete food from database"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
+              <button onClick={() => setIsDbManagerOpen(false)} className="btn btn-secondary">
+                Close Database Manager
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal: Create / Edit Custom Food ─────────────────────────────────── */}
       {isCustomFoodModalOpen && (
         <div className="modal-backdrop" onClick={() => setIsCustomFoodModalOpen(false)}>
           <div className="modal-dialog" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <div>
-                <h3 style={{ fontSize: 18, fontWeight: 800 }}>Create Custom Food Item</h3>
-                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Add custom items to your personal nutritional library</p>
-              </div>
-              <button onClick={() => setIsCustomFoodModalOpen(false)} className="btn-icon" style={{ width: 32, height: 32 }}>
-                ✕
-              </button>
+              <h3 style={{ fontSize: 18, fontWeight: 800 }}>
+                {editingDbFood ? `Edit ${editingDbFood.name}` : 'Create New Food Item'}
+              </h3>
+              <button onClick={() => setIsCustomFoodModalOpen(false)} className="btn-icon" style={{ width: 32, height: 32 }}>✕</button>
             </div>
 
-            <form onSubmit={handleCreateCustomFood} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
-                  Food Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. My Homemade Protein Shake"
-                  value={customName}
-                  onChange={e => setCustomName(e.target.value)}
-                  required
-                />
+            <form onSubmit={handleSaveDbFood} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
+                    Food Name
+                  </label>
+                  <input
+                    type="text"
+                    value={customName}
+                    onChange={e => setCustomName(e.target.value)}
+                    placeholder="e.g. Grass-Fed Ribeye Steak"
+                    required
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
+                    Brand / Producer
+                  </label>
+                  <input
+                    type="text"
+                    value={customBrand}
+                    onChange={e => setCustomBrand(e.target.value)}
+                    placeholder="e.g. Butcher's Choice"
+                  />
+                </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -464,67 +727,82 @@ export default function FoodTrackerPage() {
                   <input
                     type="number"
                     value={customServingSize}
-                    onChange={e => setCustomServingSize(parseFloat(e.target.value) || 100)}
+                    onChange={e => setCustomServingSize(parseFloat(e.target.value) || 0)}
+                    required
                   />
                 </div>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
-                    Unit
+                    Serving Unit
                   </label>
                   <input
                     type="text"
                     value={customServingUnit}
                     onChange={e => setCustomServingUnit(e.target.value)}
+                    placeholder="g, ml, oz, scoop"
+                    required
                   />
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
-                    Calories
+                  <label style={{ fontSize: 11, color: 'var(--color-primary)', display: 'block', marginBottom: 2 }}>
+                    Calories (kcal)
                   </label>
                   <input
                     type="number"
                     value={customCalories}
                     onChange={e => setCustomCalories(parseFloat(e.target.value) || 0)}
+                    required
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: '#38bdf8', marginBottom: 4, display: 'block' }}>
+                  <label style={{ fontSize: 11, color: '#38bdf8', display: 'block', marginBottom: 2 }}>
                     Protein (g)
                   </label>
                   <input
                     type="number"
+                    step="0.1"
                     value={customProtein}
                     onChange={e => setCustomProtein(parseFloat(e.target.value) || 0)}
+                    required
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: '#fbbf24', marginBottom: 4, display: 'block' }}>
+                  <label style={{ fontSize: 11, color: '#fbbf24', display: 'block', marginBottom: 2 }}>
                     Carbs (g)
                   </label>
                   <input
                     type="number"
+                    step="0.1"
                     value={customCarbs}
                     onChange={e => setCustomCarbs(parseFloat(e.target.value) || 0)}
+                    required
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: '#fb7185', marginBottom: 4, display: 'block' }}>
+                  <label style={{ fontSize: 11, color: '#fb7185', display: 'block', marginBottom: 2 }}>
                     Fat (g)
                   </label>
                   <input
                     type="number"
+                    step="0.1"
                     value={customFat}
                     onChange={e => setCustomFat(parseFloat(e.target.value) || 0)}
+                    required
                   />
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-primary" style={{ marginTop: 8 }}>
-                Save Custom Food Item
-              </button>
+              <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                <button type="button" onClick={() => setIsCustomFoodModalOpen(false)} className="btn btn-secondary" style={{ flex: 1 }}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary" style={{ flex: 2 }}>
+                  {editingDbFood ? 'Save Food Changes' : 'Add Food to Database'}
+                </button>
+              </div>
             </form>
           </div>
         </div>

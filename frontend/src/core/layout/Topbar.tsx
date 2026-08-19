@@ -146,17 +146,6 @@ export function Topbar() {
           </div>
         )}
 
-        {/* 💖 Donate Button */}
-        <button
-          className="btn btn-donate btn-sm"
-          onClick={openDonateModal}
-          style={{ display: 'inline-flex', gap: 6, alignItems: 'center', padding: '6px 12px' }}
-          title="Donate / Tip Coach Pat"
-        >
-          <span>💖</span>
-          <span style={{ fontWeight: 700 }}>Donate</span>
-        </button>
-
         {/* Quick Log Button */}
         <button
           className="btn btn-primary btn-sm"
@@ -399,7 +388,7 @@ export function Topbar() {
                 <span style={{ fontSize: 16 }}>🏃</span>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 12 }}>Athlete / Client</div>
-                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Alex Rivers (Password required)</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Alex Rivers (Self-tracking)</div>
                 </div>
               </button>
 
@@ -425,7 +414,7 @@ export function Topbar() {
                 <span style={{ fontSize: 16 }}>👑</span>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 12 }}>Head Coach (Admin)</div>
-                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Coach Pat (Password: coach123)</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Coach Pat (Management & Review)</div>
                 </div>
               </button>
 
@@ -450,7 +439,7 @@ export function Topbar() {
                 <span style={{ fontSize: 16 }}>🛡️</span>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 12 }}>Staff Trainer</div>
-                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Sarah Lin (Password: staff123)</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Sarah Lin (Performance Specialist)</div>
                 </div>
               </button>
             </div>

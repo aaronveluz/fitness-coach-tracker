@@ -15,9 +15,10 @@ export default function DashboardPage() {
     workouts,
     weightLogs,
     meetups,
+    assignedTasks,
+    toggleTaskCompleted,
     openQuickAdd,
     openPaymentModal,
-    openDonateModal,
     setActiveQuickAddTab,
   } = useFitnessStore();
 
@@ -60,9 +61,6 @@ export default function DashboardPage() {
         </div>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button className="btn btn-donate btn-sm" onClick={openDonateModal}>
-            <span>💖</span> Tip Coach Pat
-          </button>
           <button className="btn btn-secondary btn-sm" onClick={() => navigate('/form-correction')}>
             <span>🎯</span> Form Guides
           </button>
@@ -118,6 +116,64 @@ export default function DashboardPage() {
             >
               View Meet-Up Agenda & InBody History →
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Assigned Tasks & Programming from Coach Pat ──────────────────────── */}
+      {assignedTasks.filter(t => !t.completed).length > 0 && (
+        <div className="card" style={{ padding: 18, borderLeft: '4px solid var(--color-cyan)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 20 }}>📋</span>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>
+                Active Tasks & Workouts Prescribed by Coach Pat
+              </h3>
+              <span className="badge badge-cyan" style={{ fontSize: 10 }}>
+                {assignedTasks.filter(t => !t.completed).length} Pending
+              </span>
+            </div>
+            <button onClick={() => navigate('/coach-dashboard')} className="btn btn-secondary btn-sm" style={{ fontSize: 11 }}>
+              View All Coaching Directives →
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
+            {assignedTasks.filter(t => !t.completed).slice(0, 3).map(task => (
+              <div
+                key={task.id}
+                style={{
+                  background: 'var(--bg-card-elevated)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 12,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 6,
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="badge badge-emerald" style={{ fontSize: 9, textTransform: 'uppercase' }}>
+                    {task.category}
+                  </span>
+                  <span style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Due: {task.dueDate}</span>
+                </div>
+                <strong style={{ fontSize: 13, color: 'var(--text-main)' }}>{task.title}</strong>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.3 }}>
+                  {task.description}
+                </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                  <span style={{ fontSize: 10, color: 'var(--color-primary)' }}>By: {task.assignedBy}</span>
+                  <button
+                    onClick={() => toggleTaskCompleted(task.id)}
+                    className="btn btn-primary btn-sm"
+                    style={{ fontSize: 10, padding: '3px 8px' }}
+                  >
+                    ✓ Complete Task
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
