@@ -86,6 +86,14 @@ export const navigationItems: NavItem[] = [
     badgeColor: 'rose',
   },
   {
+    label: 'User Management',
+    path: '/users',
+    icon: '👥',
+    group: 'Coaching',
+    badge: 'Admin',
+    badgeColor: 'amber',
+  },
+  {
     label: 'QR Payments & Plans',
     path: '/payments',
     icon: '💳',

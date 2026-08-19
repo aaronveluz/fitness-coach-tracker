@@ -19,6 +19,7 @@ export default function SettingsPage() {
     coachPatQrConfig,
     updateCoachPatQrConfig,
     openDonateModal,
+    openRolePasswordModal,
     donations,
   } = useFitnessStore();
 
@@ -260,49 +261,49 @@ export default function SettingsPage() {
       {/* ── Role Switcher Card ──────────────────────────────────────────────── */}
       <div className="card">
         <h3 className="card-title" style={{ marginBottom: 10 }}>
-          <span>👥</span> Demo Role Switcher
+          <span>👥</span> Role Switcher (Password Protected)
         </h3>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14 }}>
-          Toggle between athlete and coaching staff views to test multi-role features.
+          Switching roles requires entering that account's security password or PIN.
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
           <button
             type="button"
-            onClick={() => switchRole('client')}
+            onClick={() => openRolePasswordModal('client')}
             className={`btn ${currentUser.role === 'client' ? 'btn-primary' : 'btn-secondary'}`}
             style={{ padding: '12px 14px', justifyContent: 'flex-start' }}
           >
             <span>🏃</span>
             <div style={{ textAlign: 'left' }}>
               <div style={{ fontWeight: 700 }}>Athlete (Alex Rivers)</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Self-tracking view</div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Password: <code>fitness123</code></div>
             </div>
           </button>
 
           <button
             type="button"
-            onClick={() => switchRole('coach')}
+            onClick={() => openRolePasswordModal('coach')}
             className={`btn ${currentUser.role === 'coach' ? 'btn-primary' : 'btn-secondary'}`}
             style={{ padding: '12px 14px', justifyContent: 'flex-start' }}
           >
             <span>👑</span>
             <div style={{ textAlign: 'left' }}>
               <div style={{ fontWeight: 700 }}>Head Coach (Coach Pat)</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Monitoring & meetups</div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Password: <code>coach123</code></div>
             </div>
           </button>
 
           <button
             type="button"
-            onClick={() => switchRole('staff')}
+            onClick={() => openRolePasswordModal('staff')}
             className={`btn ${currentUser.role === 'staff' ? 'btn-primary' : 'btn-secondary'}`}
             style={{ padding: '12px 14px', justifyContent: 'flex-start' }}
           >
             <span>🛡️</span>
             <div style={{ textAlign: 'left' }}>
               <div style={{ fontWeight: 700 }}>Staff Trainer (Sarah)</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Metric input portal</div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Password: <code>staff123</code></div>
             </div>
           </button>
         </div>

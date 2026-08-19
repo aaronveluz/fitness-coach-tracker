@@ -4,19 +4,22 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useFitnessStore } from '../../../app/store';
 import type { BiWeeklyMeetup } from '../../../types/fitness';
 
 export default function CoachDashboardPage() {
   const {
     currentUser,
-    switchRole,
     meetups,
     coachClients,
     scheduleBiWeeklyMeetup,
     updateMeetup,
     updateClientMetricsByStaff,
+    openRolePasswordModal,
   } = useFitnessStore();
+
+  const navigate = useNavigate();
 
   const isStaffOrCoach = currentUser.role === 'coach' || currentUser.role === 'staff';
 
@@ -128,30 +131,36 @@ export default function CoachDashboardPage() {
           </p>
         </div>
 
-        {/* Demo Switcher Pill */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-card)', padding: '6px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Role Perspective:</span>
-          <button
-            onClick={() => switchRole('client')}
-            className={`btn btn-sm ${currentUser.role === 'client' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ fontSize: 11, padding: '3px 8px' }}
-          >
-            Athlete (Alex)
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <button className="btn btn-secondary btn-sm" onClick={() => navigate('/users')}>
+            <span>👥</span> Manage Athletes & Staff
           </button>
-          <button
-            onClick={() => switchRole('coach')}
-            className={`btn btn-sm ${currentUser.role === 'coach' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ fontSize: 11, padding: '3px 8px' }}
-          >
-            Head Coach (Pat)
-          </button>
-          <button
-            onClick={() => switchRole('staff')}
-            className={`btn btn-sm ${currentUser.role === 'staff' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ fontSize: 11, padding: '3px 8px' }}
-          >
-            Staff (Sarah)
-          </button>
+
+          {/* Demo Switcher Pill */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg-card)', padding: '4px 8px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Role:</span>
+            <button
+              onClick={() => openRolePasswordModal('client')}
+              className={`btn btn-sm ${currentUser.role === 'client' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ fontSize: 11, padding: '3px 8px' }}
+            >
+              Athlete
+            </button>
+            <button
+              onClick={() => openRolePasswordModal('coach')}
+              className={`btn btn-sm ${currentUser.role === 'coach' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ fontSize: 11, padding: '3px 8px' }}
+            >
+              Coach Pat (Admin)
+            </button>
+            <button
+              onClick={() => openRolePasswordModal('staff')}
+              className={`btn btn-sm ${currentUser.role === 'staff' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ fontSize: 11, padding: '3px 8px' }}
+            >
+              Staff
+            </button>
+          </div>
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import { BottomNav } from './BottomNav';
 import { QuickAddModal } from '../components/QuickAddModal';
 import { PaymentModal } from '../components/PaymentModal';
 import DonateModal from '../components/DonateModal';
+import RolePasswordModal from '../components/RolePasswordModal';
 import { useFitnessStore } from '../../app/store';
 
 export default function AppShell() {
@@ -54,6 +55,7 @@ export default function AppShell() {
       <QuickAddModal />
       <PaymentModal />
       <DonateModal />
+      <RolePasswordModal />
     </div>
   );
 }

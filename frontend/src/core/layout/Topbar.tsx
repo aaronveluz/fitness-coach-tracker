@@ -25,6 +25,7 @@ export function Topbar() {
     openQuickAdd,
     openPaymentModal,
     openDonateModal,
+    openRolePasswordModal,
   } = useFitnessStore();
 
   const navigate = useNavigate();
@@ -378,9 +379,8 @@ export function Topbar() {
 
               <button
                 onClick={() => {
-                  switchRole('client');
+                  openRolePasswordModal('client');
                   setShowRoleMenu(false);
-                  navigate('/dashboard');
                 }}
                 style={{
                   width: '100%',
@@ -393,20 +393,20 @@ export function Topbar() {
                   color: currentUser.role === 'client' ? 'var(--color-primary)' : 'var(--text-main)',
                   textAlign: 'left',
                   marginBottom: 4,
+                  cursor: 'pointer',
                 }}
               >
                 <span style={{ fontSize: 16 }}>🏃</span>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 12 }}>Athlete / Client</div>
-                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Alex Rivers (Self-tracking)</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Alex Rivers (Password required)</div>
                 </div>
               </button>
 
               <button
                 onClick={() => {
-                  switchRole('coach');
+                  openRolePasswordModal('coach');
                   setShowRoleMenu(false);
-                  navigate('/coach-dashboard');
                 }}
                 style={{
                   width: '100%',
@@ -419,20 +419,20 @@ export function Topbar() {
                   color: currentUser.role === 'coach' ? 'var(--color-rose)' : 'var(--text-main)',
                   textAlign: 'left',
                   marginBottom: 4,
+                  cursor: 'pointer',
                 }}
               >
                 <span style={{ fontSize: 16 }}>👑</span>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 12 }}>Head Coach</div>
-                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Coach Pat (Monitoring & Meetups)</div>
+                  <div style={{ fontWeight: 700, fontSize: 12 }}>Head Coach (Admin)</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Coach Pat (Password: coach123)</div>
                 </div>
               </button>
 
               <button
                 onClick={() => {
-                  switchRole('staff');
+                  openRolePasswordModal('staff');
                   setShowRoleMenu(false);
-                  navigate('/coach-dashboard');
                 }}
                 style={{
                   width: '100%',
@@ -444,12 +444,13 @@ export function Topbar() {
                   background: currentUser.role === 'staff' ? 'var(--color-amber-light)' : 'transparent',
                   color: currentUser.role === 'staff' ? 'var(--color-amber)' : 'var(--text-main)',
                   textAlign: 'left',
+                  cursor: 'pointer',
                 }}
               >
                 <span style={{ fontSize: 16 }}>🛡️</span>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 12 }}>Staff Trainer</div>
-                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Sarah Lin (Metrics Input)</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Sarah Lin (Password: staff123)</div>
                 </div>
               </button>
             </div>

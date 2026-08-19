@@ -27,6 +27,9 @@ export interface UserProfile {
   assignedCoach: string;
   activeTier: 'basic' | 'pro' | 'elite';
   subscriptionExpiry: string;
+  password?: string;
+  status?: 'active' | 'inactive';
+  joinedDate?: string;
 }
 
 // ── Food & Nutrition ──────────────────────────────────────────────────────────

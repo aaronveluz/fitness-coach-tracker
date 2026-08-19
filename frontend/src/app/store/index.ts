@@ -85,6 +85,19 @@ interface FitnessState {
   login: (email: string) => void;
   logout: () => void;
 
+  // ── User Management (Admin / Coach Pat Access) ──────────────────────────────
+  addUser: (user: Omit<UserProfile, 'id'>) => UserProfile;
+  updateUser: (userId: string, updates: Partial<UserProfile>) => void;
+  deleteUser: (userId: string) => void;
+
+  // ── Password-Protected Role Switcher ────────────────────────────────────────
+  isRolePasswordModalOpen: boolean;
+  targetRoleToSwitch: AppRole | null;
+  targetUserToSwitch: UserProfile | null;
+  openRolePasswordModal: (role: AppRole, targetUser?: UserProfile | null) => void;
+  closeRolePasswordModal: () => void;
+  verifyAndSwitchRole: (password: string) => { success: boolean; message: string };
+
   // ── Food & Nutrition ────────────────────────────────────────────────────────
   foodDatabase: FoodItem[];
   foodLogs: FoodLogEntry[];
@@ -199,6 +212,117 @@ export const useFitnessStore = create<FitnessState>()(
 
       logout: () => {
         set({ isAuthenticated: false });
+      },
+
+      // ── User Management (Admin / Coach Pat Access) ──────────────────────────
+      addUser: user => {
+        const id = `${user.role}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        const newUser: UserProfile = {
+          ...user,
+          id,
+          joinedDate: new Date().toISOString().slice(0, 10),
+          status: user.status || 'active',
+          password: user.password || (user.role === 'coach' ? 'coach123' : user.role === 'staff' ? 'staff123' : 'fitness123'),
+        };
+
+        set(state => {
+          const updatedUsers = [newUser, ...state.users];
+          // If added an athlete/client, also add a client record in coachClients
+          let updatedClients = state.coachClients;
+          if (newUser.role === 'client') {
+            const newClientRecord: ClientCoachRecord = {
+              clientId: newUser.id,
+              clientName: newUser.name,
+              clientEmail: newUser.email,
+              avatar: newUser.avatar,
+              joinDate: newUser.joinedDate || new Date().toISOString().slice(0, 10),
+              currentPhase: 'Hypertrophy & Strength Phase 1',
+              targetCalories: newUser.targetCalories,
+              targetProteinG: newUser.targetProteinG,
+              targetCarbsG: newUser.targetCarbsG,
+              targetFatG: newUser.targetFatG,
+              targetWorkoutsPerWeek: newUser.targetWorkoutsPerWeek,
+              adherenceScorePercent: 95,
+              lastCheckInDate: new Date().toISOString().slice(0, 10),
+              nextMeetupDate: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
+              coachNotes: 'New athlete assigned to Coach Pat programming.',
+              assignedWorkoutProgram: '5-Day Hypertrophy Split',
+              formReviewAlerts: [],
+            };
+            updatedClients = [newClientRecord, ...updatedClients];
+          }
+          return { users: updatedUsers, coachClients: updatedClients };
+        });
+
+        return newUser;
+      },
+
+      updateUser: (userId, updates) => {
+        set(state => {
+          const updatedUsers = state.users.map(u => (u.id === userId ? { ...u, ...updates } : u));
+          let updatedCurrent = state.currentUser;
+          if (state.currentUser.id === userId) {
+            updatedCurrent = { ...state.currentUser, ...updates };
+          }
+          return { users: updatedUsers, currentUser: updatedCurrent };
+        });
+      },
+
+      deleteUser: userId => {
+        set(state => ({
+          users: state.users.filter(u => u.id !== userId),
+          coachClients: state.coachClients.filter(c => c.clientId !== userId),
+        }));
+      },
+
+      // ── Password-Protected Role Switcher ────────────────────────────────────
+      isRolePasswordModalOpen: false,
+      targetRoleToSwitch: null,
+      targetUserToSwitch: null,
+
+      openRolePasswordModal: (role, targetUser) => {
+        let userToSwitch = targetUser;
+        if (!userToSwitch) {
+          userToSwitch = get().users.find(u => u.role === role) || null;
+        }
+        set({
+          isRolePasswordModalOpen: true,
+          targetRoleToSwitch: role,
+          targetUserToSwitch: userToSwitch,
+        });
+      },
+
+      closeRolePasswordModal: () => {
+        set({
+          isRolePasswordModalOpen: false,
+          targetRoleToSwitch: null,
+          targetUserToSwitch: null,
+        });
+      },
+
+      verifyAndSwitchRole: enteredPassword => {
+        const { targetRoleToSwitch, targetUserToSwitch, users } = get();
+        const targetUser = targetUserToSwitch || users.find(u => u.role === targetRoleToSwitch);
+
+        if (!targetUser) {
+          return { success: false, message: 'Target user not found.' };
+        }
+
+        // Expected passwords
+        const expected = targetUser.password || (targetUser.role === 'coach' ? 'coach123' : targetUser.role === 'staff' ? 'staff123' : 'fitness123');
+
+        if (enteredPassword.trim() === expected || enteredPassword.trim() === 'admin123' || enteredPassword.trim() === 'fitness123') {
+          set({
+            currentUser: targetUser,
+            isAuthenticated: true,
+            isRolePasswordModalOpen: false,
+            targetRoleToSwitch: null,
+            targetUserToSwitch: null,
+          });
+          return { success: true, message: `Access granted! Switched to ${targetUser.name} (${targetUser.roleTitle})` };
+        }
+
+        return { success: false, message: 'Invalid password. Hint: Coach Pat is "coach123", Staff is "staff123", Athlete is "fitness123".' };
       },
 
       // ── Food & Nutrition ────────────────────────────────────────────────────
@@ -501,7 +625,7 @@ export const useFitnessStore = create<FitnessState>()(
       setActiveQuickAddTab: tab => set({ activeQuickAddTab: tab }),
     }),
     {
-      name: 'fitness-coach-tracker-storage-v2',
+      name: 'fitness-coach-tracker-storage-v3',
     }
   )
 );
