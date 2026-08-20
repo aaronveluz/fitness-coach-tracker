@@ -633,7 +633,7 @@ export default function UsersPage() {
 
               {/* Physical Targets */}
               <div style={{ background: 'var(--bg-card-elevated)', padding: 12, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
                   🎯 Physical Metrics & Macronutrient Targets
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>

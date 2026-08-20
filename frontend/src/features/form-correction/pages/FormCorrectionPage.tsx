@@ -223,7 +223,7 @@ export default function FormCorrectionPage() {
               {activeGuide.correctFormPoints.map((pt, i) => (
                 <div key={i} style={{ display: 'flex', gap: 10, fontSize: 13 }}>
                   <span style={{ color: 'var(--color-primary)', fontWeight: 800 }}>✓</span>
-                  <span style={{ color: '#fff' }}>{pt}</span>
+                  <span style={{ color: 'var(--text-main)' }}>{pt}</span>
                 </div>
               ))}
             </div>
@@ -237,7 +237,7 @@ export default function FormCorrectionPage() {
                 {activeGuide.jointAngleCheckpoints.map((chk, i) => (
                   <div key={i} style={{ fontSize: 12, display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: 'var(--text-muted)' }}>{chk.joint}:</span>
-                    <strong style={{ color: '#fff' }}>{chk.optimalAngle}</strong>
+                    <strong style={{ color: 'var(--text-main)' }}>{chk.optimalAngle}</strong>
                   </div>
                 ))}
               </div>

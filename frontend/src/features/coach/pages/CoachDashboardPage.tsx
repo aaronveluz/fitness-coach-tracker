@@ -329,7 +329,7 @@ export default function CoachDashboardPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>
                 📋 Assigned Tasks & Workouts for {activeUser.name}
               </h3>
               <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
@@ -370,7 +370,7 @@ export default function CoachDashboardPage() {
                     >
                       {task.category}
                     </span>
-                    <h4 style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>{task.title}</h4>
+                    <h4 style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-main)' }}>{task.title}</h4>
                   </div>
 
                   <span
@@ -435,7 +435,7 @@ export default function CoachDashboardPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>
                 🏋️‍♂️ Workouts Logged by {activeUser.name}
               </h3>
               <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>

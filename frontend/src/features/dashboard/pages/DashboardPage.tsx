@@ -99,7 +99,7 @@ export default function DashboardPage() {
                   Upcoming with {nextMeetup.coachName}
                 </span>
               </div>
-              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginTop: 3 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginTop: 3 }}>
                 Physical Assessment & Program Progression Review
               </h3>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
@@ -126,7 +126,7 @@ export default function DashboardPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: 20 }}>📋</span>
-              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>
                 Active Tasks & Workouts Prescribed by Coach Pat
               </h3>
               <span className="badge badge-cyan" style={{ fontSize: 10 }}>
@@ -414,7 +414,7 @@ export default function DashboardPage() {
               >
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>{wo.title}</span>
+                    <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-main)' }}>{wo.title}</span>
                     <span className="badge badge-emerald" style={{ fontSize: 9 }}>{wo.splitType}</span>
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
@@ -448,7 +448,7 @@ export default function DashboardPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 20 }}>🎯</span>
               <div>
-                <div style={{ fontWeight: 700, fontSize: 12, color: '#fff' }}>Exercise Form Correction</div>
+                <div style={{ fontWeight: 700, fontSize: 12, color: 'var(--text-main)' }}>Exercise Form Correction</div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Illustrated anatomy cues & dangerous mistakes</div>
               </div>
             </div>

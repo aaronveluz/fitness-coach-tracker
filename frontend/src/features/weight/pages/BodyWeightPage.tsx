@@ -263,7 +263,7 @@ export default function BodyWeightPage() {
                     transition: 'background var(--transition-fast)',
                   }}
                 >
-                  <td style={{ padding: '12px', fontWeight: 600, color: '#fff' }}>{log.date}</td>
+                  <td style={{ padding: '12px', fontWeight: 600, color: 'var(--text-main)' }}>{log.date}</td>
                   <td style={{ padding: '12px', fontWeight: 800, color: 'var(--color-primary)', fontSize: 15 }}>
                     {log.weightKg} kg
                   </td>

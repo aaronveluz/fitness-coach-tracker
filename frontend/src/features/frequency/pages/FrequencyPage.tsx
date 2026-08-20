@@ -202,7 +202,7 @@ export default function FrequencyPage() {
             return (
               <div key={split}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
-                  <span style={{ fontWeight: 700, color: '#fff' }}>{split}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{split}</span>
                   <span style={{ color: 'var(--text-muted)' }}>{count} sessions ({percent}%)</span>
                 </div>
                 <div className="progress-bar-track">

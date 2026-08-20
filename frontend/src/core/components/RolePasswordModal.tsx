@@ -86,7 +86,7 @@ export default function RolePasswordModal() {
               🔒
             </div>
             <div>
-              <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>Role Authentication</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>Role Authentication</h3>
               <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Password verification required</p>
             </div>
           </div>
@@ -119,7 +119,7 @@ export default function RolePasswordModal() {
             <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
               Switching Account To:
             </div>
-            <strong style={{ fontSize: 15, color: '#fff' }}>
+            <strong style={{ fontSize: 15, color: 'var(--text-main)' }}>
               {targetUserToSwitch ? targetUserToSwitch.name : roleTitle}
             </strong>
             <div style={{ fontSize: 11, color: 'var(--color-primary)', fontWeight: 600, marginTop: 2 }}>

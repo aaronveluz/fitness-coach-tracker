@@ -189,7 +189,7 @@ export function PaymentModal() {
                         POPULAR
                       </span>
                     )}
-                    <div style={{ fontWeight: 800, fontSize: 13, color: '#fff' }}>{plan.title}</div>
+                    <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--text-main)' }}>{plan.title}</div>
                     <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 800, color: 'var(--color-primary)', marginTop: 4 }}>
                       ${plan.priceUsd}
                       <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 400 }}> /mo</span>
@@ -250,7 +250,7 @@ export function PaymentModal() {
                 {renderQrCodeSvg()}
               </div>
 
-              <div style={{ fontFamily: 'var(--font-heading)', fontSize: 24, fontWeight: 800, color: '#fff' }}>
+              <div style={{ fontFamily: 'var(--font-heading)', fontSize: 24, fontWeight: 800, color: 'var(--text-main)' }}>
                 Total Amount: <span style={{ color: 'var(--color-primary)' }}>${activePlan.priceUsd}.00 USD</span>
               </div>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
@@ -305,7 +305,7 @@ export function PaymentModal() {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)' }}>
                 <span className="text-muted">Invoice Number</span>
-                <span style={{ fontWeight: 700, color: '#fff' }}>{completedInvoice.invoiceNo}</span>
+                <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{completedInvoice.invoiceNo}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)' }}>
                 <span className="text-muted">Payer</span>

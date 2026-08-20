@@ -225,7 +225,7 @@ export default function ExerciseLibraryPage() {
                 <span className="badge badge-emerald" style={{ fontSize: 9 }}>{ex.difficulty}</span>
               </div>
 
-              <h4 style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginBottom: 4 }}>
+              <h4 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>
                 {ex.name}
               </h4>
               <div style={{ fontSize: 12, color: 'var(--color-primary)', fontWeight: 600, marginBottom: 8 }}>
@@ -259,7 +259,7 @@ export default function ExerciseLibraryPage() {
                 <span className="badge badge-emerald" style={{ fontSize: 10, marginBottom: 4 }}>
                   {selectedExercise.equipment}
                 </span>
-                <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>
+                <h3 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)' }}>
                   {selectedExercise.name}
                 </h3>
               </div>
@@ -273,7 +273,7 @@ export default function ExerciseLibraryPage() {
                 <h4 style={{ fontSize: 14, fontWeight: 700, color: '#38bdf8', marginBottom: 6 }}>
                   Step-by-Step Instructions:
                 </h4>
-                <ol style={{ paddingLeft: 18, fontSize: 13, color: '#fff', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <ol style={{ paddingLeft: 18, fontSize: 13, color: 'var(--text-main)', display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {selectedExercise.instructions.map((step, idx) => (
                     <li key={idx}>{step}</li>
                   ))}

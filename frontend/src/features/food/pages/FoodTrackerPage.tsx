@@ -219,7 +219,7 @@ export default function FoodTrackerPage() {
             <span style={{ fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
               Daily Calorie & Macro Target Progress
             </span>
-            <h2 style={{ fontSize: 28, fontWeight: 900, color: '#fff', marginTop: 4 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-main)', marginTop: 4 }}>
               {totalCalories} <span style={{ fontSize: 16, color: 'var(--text-muted)', fontWeight: 500 }}>/ {currentUser.targetCalories} kcal</span>
             </h2>
           </div>
@@ -295,7 +295,7 @@ export default function FoodTrackerPage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span style={{ fontSize: 22 }}>{cat.icon}</span>
                   <div>
-                    <h3 style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>{cat.label}</h3>
+                    <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>{cat.label}</h3>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                       {mealLogs.length} items logged • {mealCals} kcal
                     </div>
@@ -521,7 +521,7 @@ export default function FoodTrackerPage() {
                     }}
                   >
                     <div>
-                      <strong style={{ fontSize: 13, color: '#fff' }}>{food.name}</strong>
+                      <strong style={{ fontSize: 13, color: 'var(--text-main)' }}>{food.name}</strong>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                         {food.servingSize}{food.servingUnit} • {food.protein}g P | {food.carbs}g C | {food.fat}g F
                       </div>

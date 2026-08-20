@@ -392,7 +392,7 @@ export default function UserManualPage() {
               OFFICIAL KNOWLEDGE CENTER
             </span>
           </div>
-          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 24, fontWeight: 900, color: '#fff' }}>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 24, fontWeight: 900, color: 'var(--text-main)' }}>
             {appName} User Manual & Coaching Guide
           </h1>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4, maxWidth: 680 }}>
@@ -463,7 +463,7 @@ export default function UserManualPage() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span style={{ fontSize: 16 }}>{chap.icon}</span>
-                      <strong style={{ fontSize: 13, color: isSelected ? '#fff' : 'var(--text-main)' }}>
+                      <strong style={{ fontSize: 13, color: isSelected ? 'var(--color-primary)' : 'var(--text-main)' }}>
                         {chap.title}
                       </strong>
                     </div>
@@ -508,7 +508,7 @@ export default function UserManualPage() {
                     <span className="badge badge-cyan" style={{ fontSize: 10 }}>{activeChapter.category}</span>
                     {activeChapter.badge && <span className="badge badge-rose" style={{ fontSize: 10 }}>{activeChapter.badge}</span>}
                   </div>
-                  <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 900, color: '#fff', marginTop: 4 }}>
+                  <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 900, color: 'var(--text-main)', marginTop: 4 }}>
                     {activeChapter.title}
                   </h2>
                 </div>

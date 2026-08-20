@@ -308,7 +308,7 @@ export default function PhysiqueTrackerPage() {
                   W{log.weekNumber}
                 </span>
                 <div>
-                  <h4 style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>
+                  <h4 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-main)' }}>
                     Week {log.weekNumber} Check-In
                   </h4>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>

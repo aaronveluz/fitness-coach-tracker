@@ -56,7 +56,7 @@ export default function PaymentPage() {
             <span className="badge badge-emerald">ACTIVE SUBSCRIPTION</span>
             <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Auto-renewing</span>
           </div>
-          <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginTop: 4 }}>
+          <h3 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginTop: 4 }}>
             {currentUser.activeTier === 'elite'
               ? '1-on-1 Elite Coaching Program with Coach Pat'
               : currentUser.activeTier === 'pro'
@@ -105,14 +105,14 @@ export default function PaymentPage() {
               )}
 
               <div>
-                <h4 style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 6 }}>
+                <h4 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', marginBottom: 6 }}>
                   {plan.title}
                 </h4>
                 <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16, minHeight: 36 }}>
                   {plan.description}
                 </p>
 
-                <div style={{ fontFamily: 'var(--font-heading)', fontSize: 36, fontWeight: 800, color: '#fff', marginBottom: 18 }}>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: 36, fontWeight: 800, color: 'var(--text-main)', marginBottom: 18 }}>
                   ${plan.priceUsd}
                   <span style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 400 }}> / {plan.period}</span>
                 </div>
@@ -122,7 +122,7 @@ export default function PaymentPage() {
                   {plan.features.map((feat, idx) => (
                     <div key={idx} style={{ display: 'flex', gap: 8, fontSize: 12 }}>
                       <span style={{ color: 'var(--color-primary)', fontWeight: 800 }}>✓</span>
-                      <span style={{ color: '#fff' }}>{feat}</span>
+                      <span style={{ color: 'var(--text-main)' }}>{feat}</span>
                     </div>
                   ))}
                 </div>
@@ -167,9 +167,9 @@ export default function PaymentPage() {
             <tbody>
               {transactions.map(tx => (
                 <tr key={tx.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                  <td style={{ padding: '12px', fontWeight: 700, color: '#fff' }}>{tx.invoiceNumber}</td>
+                  <td style={{ padding: '12px', fontWeight: 700, color: 'var(--text-main)' }}>{tx.invoiceNumber}</td>
                   <td style={{ padding: '12px', color: 'var(--text-muted)' }}>{tx.date}</td>
-                  <td style={{ padding: '12px', fontWeight: 600 }}>{tx.planTitle}</td>
+                  <td style={{ padding: '12px', fontWeight: 600, color: 'var(--text-main)' }}>{tx.planTitle}</td>
                   <td style={{ padding: '12px', fontWeight: 800, color: 'var(--color-primary)', fontSize: 15 }}>
                     ${tx.amountUsd}.00
                   </td>
@@ -226,11 +226,11 @@ export default function PaymentPage() {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span className="text-muted">Payment For</span>
-                <strong style={{ color: '#fff' }}>{selectedInvoice.planTitle}</strong>
+                <strong style={{ color: 'var(--text-main)' }}>{selectedInvoice.planTitle}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span className="text-muted">Payer</span>
-                <strong style={{ color: '#fff' }}>{selectedInvoice.payerName}</strong>
+                <strong style={{ color: 'var(--text-main)' }}>{selectedInvoice.payerName}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span className="text-muted">Payment Channel</span>

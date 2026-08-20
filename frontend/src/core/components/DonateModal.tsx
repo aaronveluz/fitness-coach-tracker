@@ -238,7 +238,7 @@ export default function DonateModal() {
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <strong style={{ fontSize: 13, color: '#fff' }}>{p.label}</strong>
+                      <strong style={{ fontSize: 13, color: 'var(--text-main)' }}>{p.label}</strong>
                       <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--color-primary)' }}>${p.amount}</span>
                     </div>
                     <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{p.desc}</div>
@@ -418,7 +418,7 @@ export default function DonateModal() {
                     }}
                   >
                     <div>
-                      <strong style={{ color: '#fff' }}>{d.donorName}</strong>
+                      <strong style={{ color: 'var(--text-main)' }}>{d.donorName}</strong>
                       <span style={{ color: 'var(--text-muted)', marginLeft: 6 }}>"{d.message}"</span>
                     </div>
                     <span style={{ fontWeight: 800, color: '#f43f5e' }}>+${d.amountUsd}</span>

@@ -267,19 +267,19 @@ export default function WeightliftingPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, textAlign: 'center', fontSize: 11 }}>
             <div style={{ background: 'rgba(255,255,255,0.03)', padding: 6, borderRadius: 'var(--radius-sm)' }}>
               <div style={{ color: 'var(--text-muted)' }}>90% (3 reps)</div>
-              <div style={{ fontWeight: 800, color: '#fff' }}>{Math.round(calculated1RM * 0.9)} kg</div>
+              <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{Math.round(calculated1RM * 0.9)} kg</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.03)', padding: 6, borderRadius: 'var(--radius-sm)' }}>
               <div style={{ color: 'var(--text-muted)' }}>80% (7 reps)</div>
-              <div style={{ fontWeight: 800, color: '#fff' }}>{Math.round(calculated1RM * 0.8)} kg</div>
+              <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{Math.round(calculated1RM * 0.8)} kg</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.03)', padding: 6, borderRadius: 'var(--radius-sm)' }}>
               <div style={{ color: 'var(--text-muted)' }}>70% (10 reps)</div>
-              <div style={{ fontWeight: 800, color: '#fff' }}>{Math.round(calculated1RM * 0.7)} kg</div>
+              <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{Math.round(calculated1RM * 0.7)} kg</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.03)', padding: 6, borderRadius: 'var(--radius-sm)' }}>
               <div style={{ color: 'var(--text-muted)' }}>60% (15 reps)</div>
-              <div style={{ fontWeight: 800, color: '#fff' }}>{Math.round(calculated1RM * 0.6)} kg</div>
+              <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{Math.round(calculated1RM * 0.6)} kg</div>
             </div>
           </div>
         </div>
@@ -349,7 +349,7 @@ export default function WeightliftingPage() {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                    <div style={{ fontWeight: 800, fontSize: 15, color: '#fff' }}>
+                    <div style={{ fontWeight: 800, fontSize: 15, color: 'var(--text-main)' }}>
                       {exIdx + 1}. {ex.exerciseName}
                       <span className="badge badge-cyan" style={{ marginLeft: 8, fontSize: 10 }}>{ex.targetMuscle}</span>
                     </div>
@@ -484,7 +484,7 @@ export default function WeightliftingPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 8 }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <h4 style={{ fontSize: 17, fontWeight: 800, color: '#fff' }}>{wo.title}</h4>
+                  <h4 style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-main)' }}>{wo.title}</h4>
                   <span className="badge badge-emerald">{wo.splitType}</span>
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
@@ -523,7 +523,7 @@ export default function WeightliftingPage() {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 13, marginBottom: 6 }}>
-                    <span style={{ color: '#fff' }}>{ex.exerciseName}</span>
+                    <span style={{ color: 'var(--text-main)' }}>{ex.exerciseName}</span>
                     <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>{ex.targetMuscle}</span>
                   </div>
 
@@ -539,7 +539,7 @@ export default function WeightliftingPage() {
                         }}
                       >
                         <span>Set {s.setNumber}:</span>
-                        <span style={{ color: '#fff', fontWeight: 600 }}>
+                        <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>
                           {s.weightKg} kg × {s.reps} reps {s.isPR && <span className="badge badge-amber" style={{ fontSize: 8, padding: '1px 4px' }}>PR 🏆</span>}
                         </span>
                       </div>
