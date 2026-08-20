@@ -26,6 +26,7 @@ export function Topbar() {
     openPaymentModal,
     openDonateModal,
     openRolePasswordModal,
+    logout,
   } = useFitnessStore();
 
   const navigate = useNavigate();
@@ -227,6 +228,16 @@ export function Topbar() {
           title="Payment & Subscriptions"
         >
           <span>💳</span>
+        </button>
+
+        {/* User Manual / Knowledge Center Quick Trigger */}
+        <button
+          className="btn-icon"
+          onClick={() => navigate('/manual')}
+          title="User Manual & Coaching Guides"
+          style={{ position: 'relative' }}
+        >
+          <span>📖</span>
         </button>
 
         {/* Notifications Dropdown */}
@@ -441,6 +452,33 @@ export function Topbar() {
                   <div style={{ fontWeight: 700, fontSize: 12 }}>Staff Trainer</div>
                   <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>Sarah Lin (Performance Specialist)</div>
                 </div>
+              </button>
+
+              <div style={{ borderTop: '1px solid var(--border-subtle)', margin: '6px 0' }} />
+
+              <button
+                onClick={() => {
+                  logout();
+                  setShowRoleMenu(false);
+                  navigate('/login');
+                }}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '8px 10px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'rgba(244, 63, 94, 0.1)',
+                  color: 'var(--color-rose)',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
+                <span>🚪</span>
+                <span>Sign Out of Account</span>
               </button>
             </div>
           )}

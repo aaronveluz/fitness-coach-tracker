@@ -262,7 +262,7 @@ export const useFitnessStore = create<FitnessState>()(
       // ── Auth & Users ────────────────────────────────────────────────────────
       users: initialUsers,
       currentUser: initialUsers[0],
-      isAuthenticated: true,
+      isAuthenticated: false,
 
       switchRole: (role: AppRole) => {
         const found = get().users.find(u => u.role === role);
@@ -846,7 +846,7 @@ export const useFitnessStore = create<FitnessState>()(
       setActiveQuickAddTab: tab => set({ activeQuickAddTab: tab }),
     }),
     {
-      name: 'fitness-coach-tracker-storage-v4',
+      name: 'fitness-coach-tracker-storage-v5',
     }
   )
 );

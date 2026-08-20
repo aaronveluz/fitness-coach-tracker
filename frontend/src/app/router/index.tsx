@@ -22,6 +22,7 @@ const CoachDashboardPage   = React.lazy(() => import('../../features/coach/pages
 const UsersPage            = React.lazy(() => import('../../features/users/pages/UsersPage'));
 const PaymentPage          = React.lazy(() => import('../../features/payments/pages/PaymentPage'));
 const SettingsPage         = React.lazy(() => import('../../features/settings/pages/SettingsPage'));
+const UserManualPage       = React.lazy(() => import('../../features/manual/pages/UserManualPage'));
 const NotFoundPage         = React.lazy(() => import('../../core/components/NotFoundPage'));
 
 // ── Protected Route Wrapper ──────────────────────────────────────────────────
@@ -83,6 +84,7 @@ export function AppRouter() {
             <Route path="users" element={<UsersPage />} />
             <Route path="payments" element={<PaymentPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="manual" element={<UserManualPage />} />
           </Route>
 
           {/* 404 Catch-All */}

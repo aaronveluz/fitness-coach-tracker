@@ -3,12 +3,13 @@
 // Responsive Sidebar with Configurable App Name, Nav Groups & Direct Donate Trigger
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useFitnessStore } from '../../app/store';
 import { navigationItems, type NavItem } from '../../navigation.config';
 
 export function Sidebar() {
-  const { sidebarCollapsed, toggleSidebar, currentUser, appName, openDonateModal } = useFitnessStore();
+  const { sidebarCollapsed, toggleSidebar, currentUser, appName, logout } = useFitnessStore();
+  const navigate = useNavigate();
 
   // Group nav items by group
   const grouped = navigationItems.reduce<Record<string, NavItem[]>>((acc, item) => {
@@ -173,8 +174,33 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Footer Collapse Toggle */}
-      <div style={{ padding: '10px 10px', borderTop: '1px solid var(--border-subtle)' }}>
+      {/* Footer Actions: Sign Out & Collapse Toggle */}
+      <div style={{ padding: '10px 10px', borderTop: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <button
+          onClick={() => {
+            logout();
+            navigate('/login');
+          }}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+            gap: 10,
+            padding: '8px 12px',
+            borderRadius: 'var(--radius-sm)',
+            background: 'rgba(244, 63, 94, 0.08)',
+            color: 'var(--color-rose)',
+            fontSize: 12,
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+          title={sidebarCollapsed ? 'Sign Out' : undefined}
+        >
+          <span>🚪</span>
+          {!sidebarCollapsed && <span>Sign Out</span>}
+        </button>
+
         <button
           onClick={toggleSidebar}
           style={{

@@ -102,7 +102,15 @@ export const navigationItems: NavItem[] = [
     badgeColor: 'cyan',
   },
 
-  // ── Settings ──────────────────────────────────────────────────────────────
+  // ── Help & Documentation ──────────────────────────────────────────────────
+  {
+    label: 'User Manual & Guides',
+    path: '/manual',
+    icon: '📖',
+    group: 'Account',
+    badge: 'Help',
+    badgeColor: 'cyan',
+  },
   {
     label: 'App Settings',
     path: '/settings',
