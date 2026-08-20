@@ -13,6 +13,7 @@
     "build": "npm run build --workspace=frontend",
     "build:all": "npm run build --workspace=shared && npm run build --workspace=backend && npm run build --workspace=frontend",
     "build:frontend": "npm run build --workspace=frontend",
+    "ship": "powershell -ExecutionPolicy Bypass -File ./scripts/ship.ps1",
     "lint": "npm run lint --workspaces",
     "typecheck": "npm run typecheck --workspaces",
     "test": "npm run test --workspaces",

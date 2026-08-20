@@ -28,8 +28,8 @@ This file defines the primary operational standards, workflow rules, and context
   - Audit all modified lines for race conditions, state persistence issues, TypeScript strictness, and security flaws before committing.
 - **QA & Browser Validation (`/qa <url>`):**
   - Use the native `browser_subagent` to visually verify UI responsiveness, click interaction paths, modal lifecycle, and DOM state.
-- **Ship & Verification (`/ship`):**
-  - Run full TypeScript compilation (`npm --prefix frontend run build`), verify clean git status, create atomic git commits, and assemble structured PR summaries.
+- **Ship & Auto-Deployment (`/ship`):**
+  - Run `npm run ship` (or `powershell -File ./scripts/ship.ps1`) to compile, commit, and push automatically to GitHub (`origin/main`), which triggers instant Vercel production deployment. Document results in `walkthrough.md`.
 
 ---
 
