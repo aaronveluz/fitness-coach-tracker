@@ -11,21 +11,25 @@ export default function LoginPage() {
   const { users, login, switchRole, appName } = useFitnessStore();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      setErrorMsg('Please enter both your email address and password.');
+    if (!identifier.trim() || !password.trim()) {
+      setErrorMsg('Please enter your username or email address and password.');
       return;
     }
 
-    const foundUser = users.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
+    const cleanId = identifier.trim().toLowerCase().replace(/^@/, '');
+    const foundUser = users.find(
+      u => u.email.toLowerCase() === cleanId || (u.username && u.username.toLowerCase() === cleanId)
+    );
+
     if (!foundUser) {
-      setErrorMsg('No user account found with that email address.');
+      setErrorMsg('No user account found with that username or email address.');
       return;
     }
 
@@ -106,14 +110,14 @@ export default function LoginPage() {
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
             <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>
-              Email Address
+              Username or Email Address
             </label>
             <input
-              type="email"
-              value={email}
-              placeholder="Enter your registered email..."
+              type="text"
+              value={identifier}
+              placeholder="e.g. coachpat or coach.pat@fitness.app"
               onChange={e => {
-                setEmail(e.target.value);
+                setIdentifier(e.target.value);
                 setErrorMsg('');
               }}
               required

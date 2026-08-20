@@ -26,6 +26,7 @@ export default function UsersPage() {
 
   // Add/Edit Form State
   const [formName, setFormName] = useState('');
+  const [formUsername, setFormUsername] = useState('');
   const [formEmail, setFormEmail] = useState('');
   const [formRole, setFormRole] = useState<AppRole>('client');
   const [formRoleTitle, setFormRoleTitle] = useState('Athlete / Client');
@@ -47,6 +48,7 @@ export default function UsersPage() {
   const filteredUsers = users.filter(u => {
     const matchesSearch =
       u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (u.username && u.username.toLowerCase().includes(searchQuery.toLowerCase())) ||
       u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       u.roleTitle.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -62,6 +64,7 @@ export default function UsersPage() {
   const handleOpenAddModal = (presetRole: AppRole = 'client') => {
     setEditingUser(null);
     setFormName('');
+    setFormUsername('');
     setFormEmail('');
     setFormRole(presetRole);
     setFormRoleTitle(presetRole === 'client' ? 'Athlete / Client' : 'Staff Strength Trainer');
@@ -83,6 +86,7 @@ export default function UsersPage() {
   const handleOpenEditModal = (u: UserProfile) => {
     setEditingUser(u);
     setFormName(u.name);
+    setFormUsername(u.username || u.name.toLowerCase().replace(/\s+/g, ''));
     setFormEmail(u.email);
     setFormRole(u.role);
     setFormRoleTitle(u.roleTitle);
@@ -105,9 +109,12 @@ export default function UsersPage() {
     e.preventDefault();
     if (!formName.trim() || !formEmail.trim()) return;
 
+    const finalUsername = formUsername.trim().replace(/^@/, '') || formName.trim().toLowerCase().replace(/\s+/g, '');
+
     if (editingUser) {
       updateUser(editingUser.id, {
         name: formName.trim(),
+        username: finalUsername,
         email: formEmail.trim(),
         role: formRole,
         roleTitle: formRoleTitle,
@@ -124,7 +131,7 @@ export default function UsersPage() {
         assignedCoach: formCoach,
         activeTier: formTier,
       });
-      setToastMsg(`User ${formName} updated successfully!`);
+      setToastMsg(`User ${formName} (@${finalUsername}) updated successfully!`);
     } else {
       const avatarMap =
         formRole === 'coach'
@@ -135,6 +142,7 @@ export default function UsersPage() {
 
       addUser({
         name: formName.trim(),
+        username: finalUsername,
         email: formEmail.trim(),
         role: formRole,
         roleTitle: formRoleTitle,
@@ -158,7 +166,7 @@ export default function UsersPage() {
         status: 'active',
         joinedDate: new Date().toISOString().slice(0, 10),
       });
-      setToastMsg(`New ${formRole === 'client' ? 'Athlete' : 'Staff'} ${formName} registered successfully!`);
+      setToastMsg(`New ${formRole === 'client' ? 'Athlete' : 'Staff'} ${formName} (@${finalUsername}) registered!`);
     }
 
     setIsAddModalOpen(false);
@@ -383,8 +391,13 @@ export default function UsersPage() {
                         style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }}
                       />
                       <div>
-                        <div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: 14 }}>
-                          {u.name}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: 14 }}>
+                            {u.name}
+                          </span>
+                          <span className="badge badge-purple" style={{ fontSize: 9, padding: '2px 6px' }}>
+                            @{u.username || u.name.toLowerCase().replace(/\s+/g, '')}
+                          </span>
                         </div>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{u.email}</div>
                         {u.phone && <div style={{ fontSize: 10, color: 'var(--text-subtle)' }}>{u.phone}</div>}
@@ -521,7 +534,7 @@ export default function UsersPage() {
             </div>
 
             <form onSubmit={handleSaveUser} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
                     Full Name
@@ -532,6 +545,17 @@ export default function UsersPage() {
                     onChange={e => setFormName(e.target.value)}
                     placeholder="e.g. Jordan Smith"
                     required
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>
+                    Username (@handle)
+                  </label>
+                  <input
+                    type="text"
+                    value={formUsername}
+                    onChange={e => setFormUsername(e.target.value)}
+                    placeholder="e.g. jordansmith"
                   />
                 </div>
                 <div>

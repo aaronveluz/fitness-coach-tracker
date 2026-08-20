@@ -8,6 +8,7 @@ export type AppRole = 'client' | 'coach' | 'staff';
 export interface UserProfile {
   id: string;
   name: string;
+  username: string;
   email: string;
   role: AppRole;
   roleTitle: string;

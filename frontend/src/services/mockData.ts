@@ -23,6 +23,7 @@ export const initialUsers: UserProfile[] = [
   {
     id: 'user_alex',
     name: 'Alex Rivers',
+    username: 'alexrivers',
     email: 'alex.rivers@fitness.app',
     role: 'client',
     roleTitle: 'Athlete / Client',
@@ -49,6 +50,7 @@ export const initialUsers: UserProfile[] = [
   {
     id: 'coach_pat',
     name: 'Coach Pat',
+    username: 'coachpat',
     email: 'coach.pat@fitness.app',
     role: 'coach',
     roleTitle: 'Head Strength & Physique Coach (Admin / CSCS)',
@@ -75,6 +77,7 @@ export const initialUsers: UserProfile[] = [
   {
     id: 'staff_sarah',
     name: 'Sarah Lin',
+    username: 'sarahlin',
     email: 'sarah.lin@fitness.app',
     role: 'staff',
     roleTitle: 'Staff Performance Trainer & Nutrition Specialist',
@@ -101,6 +104,7 @@ export const initialUsers: UserProfile[] = [
   {
     id: 'user_marcus',
     name: 'Marcus Vance',
+    username: 'marcusvance',
     email: 'marcus.vance@fitness.app',
     role: 'client',
     roleTitle: 'Athlete / Powerbuilding Focus',
@@ -127,6 +131,7 @@ export const initialUsers: UserProfile[] = [
   {
     id: 'user_elena',
     name: 'Elena Rostova',
+    username: 'elenarostova',
     email: 'elena.rostova@fitness.app',
     role: 'client',
     roleTitle: 'Athlete / Glute & Hypertrophy Focus',
@@ -153,6 +158,7 @@ export const initialUsers: UserProfile[] = [
   {
     id: 'staff_david',
     name: 'David Miller',
+    username: 'davidmiller',
     email: 'david.miller@fitness.app',
     role: 'staff',
     roleTitle: 'Staff Biomechanics & Movement Coach',
